@@ -1,0 +1,17 @@
+package com.garrett.mod;
+
+import me.shedaniel.autoconfig.ConfigData;
+import me.shedaniel.autoconfig.annotation.Config;
+import me.shedaniel.autoconfig.annotation.ConfigEntry;
+
+@Config(name = "garrettmod")
+public class GarrettModConfig implements ConfigData {
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableParrotArmorStands = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableGunpowderExplosions = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableLogicalStairs = true;
+}
