@@ -25,35 +25,25 @@ public abstract class FurnaceGunpowderMixin {
         if (world.isClient) return;
         if (!GarrettMod.CONFIG.enableGunpowderExplosions) return;
 
-        // AbstractFurnaceBlockEntity.litTime (mapped name for burnTime in some mappings)
-        // We use an Accessor or cast if we can't shadow static context directly, 
-        // but here we check if the furnace is LIT.
+        // In AbstractFurnaceBlockEntity:
+        // Slot 0: Input
+        // Slot 1: Fuel
+        // Slot 2: Output
         
-        // In 26.1.2 mappings, let's assume getLitTime or similar. 
-        // For now, checking if it has any fuel time left.
-        
-        // Use an accessor-like approach via shadowing if possible, 
-        // but static tick methods provide the instance.
-        
-        // Cast to access protected fields if in same package or use accessors.
-        // Assuming 'litTime' is the field for current burn progress.
-        
+        // We check if the furnace is lit (litTime > 0) AND has gunpowder in the input slot
         if (((FurnaceGunpowderMixin)(Object)blockEntity).litTime > 0) {
-            for (int i = 0; i < blockEntity.getContainerSize(); i++) {
-                ItemStack stack = blockEntity.getItem(i);
-                if (stack.is(Items.GUNPOWDER)) {
-                    world.explode(
-                        null,
-                        pos.getX() + 0.5,
-                        pos.getY() + 0.5,
-                        pos.getZ() + 0.5,
-                        3.0f,
-                        true,
-                        World.ExplosionSourceType.BLOCK
-                    );
-                    world.destroyBlock(pos, false);
-                    break;
-                }
+            ItemStack inputStack = blockEntity.getItem(0);
+            if (inputStack.is(Items.GUNPOWDER)) {
+                world.explode(
+                    null,
+                    pos.getX() + 0.5,
+                    pos.getY() + 0.5,
+                    pos.getZ() + 0.5,
+                    3.0f,
+                    true,
+                    World.ExplosionSourceType.BLOCK
+                );
+                world.destroyBlock(pos, false);
             }
         }
     }
