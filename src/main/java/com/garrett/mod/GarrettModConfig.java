@@ -14,4 +14,10 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableLogicalStairs = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enablePlaceableGunpowder = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableRepairableAnvils = true;
 }

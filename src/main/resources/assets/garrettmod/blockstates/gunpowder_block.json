@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "garrettmod:block/gunpowder_block" },
+    "lit=true": { "model": "garrettmod:block/gunpowder_block_lit" }
+  }
+}

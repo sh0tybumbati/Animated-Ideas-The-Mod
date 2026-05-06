@@ -18,6 +18,9 @@
 		"main": [
 			"com.garrett.mod.GarrettMod"
 		],
+		"client": [
+			"com.garrett.mod.client.GarrettModClient"
+		],
 		"modmenu": [
 			"com.garrett.mod.GarrettModMenuImpl"
 		]
