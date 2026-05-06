@@ -20,4 +20,7 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableRepairableAnvils = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enablePlaceableMilk = true;
 }
