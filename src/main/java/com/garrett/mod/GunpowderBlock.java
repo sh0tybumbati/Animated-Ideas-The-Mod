@@ -73,7 +73,7 @@ public class GunpowderBlock extends Block {
     private void checkIgnition(Level world, BlockPos pos, BlockState state) {
         if (!state.getValue(LIT) && world.hasNeighborSignal(pos)) {
             world.setBlock(pos, state.setValue(LIT, true), 3);
-            world.scheduleTick(pos, this, 20);
+            world.scheduleTick(pos, this, 4);
             if (!world.isClientSide()) {
                 world.playSound(null, pos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
             }
@@ -109,7 +109,7 @@ public class GunpowderBlock extends Block {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if ((stack.is(Items.FLINT_AND_STEEL) || stack.is(Items.FIRE_CHARGE)) && !state.getValue(LIT)) {
             world.setBlock(pos, state.setValue(LIT, true), 3);
-            world.scheduleTick(pos, this, 20);
+            world.scheduleTick(pos, this, 4);
             if (!world.isClientSide()) {
                 world.playSound(null, pos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
             }
