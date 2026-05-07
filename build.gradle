@@ -14,12 +14,13 @@ repositories {
 	// for more information about repositories.
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
+    mavenCentral() // Add MavenCentral for broader compatibility
+    gradlePluginPortal() // Ensure Gradle plugin portal is available
 }
 
 loom {
 	splitEnvironmentSourceSets()
-    mappings("net.fabricmc:yarn:1.21+build.1:v2")
-
+    
 	mods {
 		"${project.mod_id}" {
 			sourceSet sourceSets.main
@@ -46,6 +47,8 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	// Correctly declare mappings in the dependencies block
+	mappings "net.fabricmc:yarn:1.21+build.1:v2"
 	
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
@@ -75,9 +78,6 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
 	sourceCompatibility = JavaVersion.VERSION_25
@@ -93,19 +93,12 @@ jar {
 	}
 }
 
-// configure the maven publication
 publishing {
 	publications {
 		create("mavenJava", MavenPublication) {
 			from components.java
 		}
 	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
 	}
 }
