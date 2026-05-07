@@ -24,7 +24,7 @@ public class GarrettMod implements ModInitializer {
 	public static GarrettModConfig CONFIG;
 
 	public static final Block GUNPOWDER_BLOCK = new GunpowderBlock(
-		BlockBehaviour.Properties.of().noOcclusion().noCollision().instabreak()
+		BlockBehaviour.Properties.of().noOcclusion().instabreak()
 	);
 
 	@Override
@@ -41,7 +41,7 @@ public class GarrettMod implements ModInitializer {
 			ItemStack stack = player.getItemInHand(hand);
 			if (stack.is(Items.GUNPOWDER)) {
 				BlockPos pos = hitResult.getBlockPos().relative(hitResult.getDirection());
-				if (world.getBlockState(pos).isAir() && GUNPOWDER_BLOCK.canSurvive(GUNPOWDER_BLOCK.defaultBlockState(), world, pos)) {
+				if (world.getBlockState(pos).isAir() && ((GunpowderBlock) GUNPOWDER_BLOCK).canPlaceAt(world, pos)) {
 					if (!world.isClientSide()) {
 						world.setBlock(pos, GUNPOWDER_BLOCK.defaultBlockState(), 3);
 						if (!player.isCreative()) stack.shrink(1);

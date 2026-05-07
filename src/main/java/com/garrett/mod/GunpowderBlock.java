@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -91,8 +91,12 @@ public class GunpowderBlock extends Block {
         world.removeBlock(pos, false);
     }
 
+    public boolean canPlaceAt(LevelReader world, BlockPos pos) {
+        return world.getBlockState(pos.below()).isFaceSturdy(world, pos.below(), Direction.UP);
+    }
+
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if ((stack.is(Items.FLINT_AND_STEEL) || stack.is(Items.FIRE_CHARGE)) && !state.getValue(LIT)) {
             world.setBlock(pos, state.setValue(LIT, true), 3);
             world.scheduleTick(pos, this, 2);
@@ -103,7 +107,7 @@ public class GunpowderBlock extends Block {
                     stack.shrink(1);
                 }
             }
-            return InteractionResult.sidedSuccess(world.isClientSide());
+            return ItemInteractionResult.sidedSyncedSuccess(world.isClientSide());
         }
         return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
