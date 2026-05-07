@@ -47,8 +47,8 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	// Correctly declare mappings in the dependencies block
-	mappings "net.fabricmc:yarn:1.21+build.1:v2"
+	// Correctly declare Yarn mappings using the loom object within dependencies
+	mappings loom.yarn("net.fabricmc:yarn:1.21+build.1:v2")
 	
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
