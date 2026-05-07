@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT' 
+    id 'net.fabricmc.fabric-loom-remap' version '1.16-SNAPSHOT' // Use the -remap plugin for 1.21
     id 'maven-publish'
 }
 
@@ -43,9 +43,6 @@ dependencies {
         // To change the versions see the gradle.properties file
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         
-        // Correctly declare Yarn mappings (no loom.yarn wrapper needed)
-        mappings "net.fabricmc:yarn:1.21+build.1:v2"
-
         // These MUST be modImplementation, not just implementation
         modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
