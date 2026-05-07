@@ -1,39 +1,39 @@
 {
-	"schemaVersion": 1,
-	"id": "garrettmod",
-	"version": "${version}",
-	"name": "GarrettTheCarrotMod",
-	"description": "A Minecraft mod based on GarrettTheCarrot's 'Animating your Minecraft Ideas' series.",
-	"authors": [
-		"GarrettTheCarrot Community",
-		"Gemini CLI"
-	],
-	"contact": {
-		"sources": "https://github.com/GarrettTheCarrot/GarrettTheCarrotMod"
-	},
-	"license": "MIT",
-	"icon": "assets/garrettmod/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-			"com.garrett.mod.GarrettMod"
-		],
-		"client": [
-			"com.garrett.mod.client.GarrettModClient"
-		],
-		"modmenu": [
-			"com.garrett.mod.GarrettModMenuImpl"
-		]
-	},
-	"mixins": [
-		"garrettmod.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.18.1",
-		"minecraft": "~26.1.2",
-		"java": ">=25",
-		"fabric-api": "*",
-		"cloth-config": "*",
-		"modmenu": "*"
-	}
+  "schemaVersion": 1,
+  "id": "garrettthecarrotmod",
+  "version": "${version}",
+  "name": "GarrettTheCarrotMod",
+  "description": "A Minecraft mod based on GarrettTheCarrot's 'Animating your Minecraft Ideas' series.",
+  "authors": [
+    "GarrettTheCarrot Community",
+    "Gemini CLI"
+  ],
+  "contact": {
+    "sources": "https://github.com/sh0tybumbati/Animated-Ideas-The-Mod"
+  },
+  "license": "MIT",
+  "icon": "assets/garrettthecarrotmod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.garrett.mod.GarrettMod"
+    ],
+    "client": [
+      "com.garrett.mod.client.GarrettModClient"
+    ],
+    "modmenu": [
+      "com.garrett.mod.GarrettModMenuImpl"
+    ]
+  },
+  "mixins": [
+    "garrettmod.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "~1.21",
+    "java": ">=25",
+    "fabric-api": "*",
+    "cloth-config": "*",
+    "modmenu": "*"
+  }
 }

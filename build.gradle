@@ -1,16 +1,21 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT' 
-    id 'maven-publish'
+	id 'net.fabricmc.fabric-loom' version '1.16.1'
+	id 'maven-publish'
 }
 
 version = project.mod_version
 group = project.maven_group
 
 repositories {
+	// Add repositories to retrieve artifacts from in here.
+	// You should only use this when depending on other mods because
+	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
+	// for more information about repositories.
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
-    mavenCentral()
-    gradlePluginPortal()
+    mavenCentral() // Add MavenCentral for broader compatibility
+    gradlePluginPortal() // Ensure Gradle plugin portal is available
 }
 
 loom {
@@ -42,7 +47,6 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	// Correctly declare Yarn mappings using the loom object within dependencies
 	mappings loom.yarn("net.fabricmc:yarn:1.21+build.1:v2")
 	
 	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
