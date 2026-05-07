@@ -7,8 +7,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,13 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class FurnaceGunpowderMixin {
 
-    @Shadow
-    protected int litTime;
-
     @Inject(method = "serverTick", at = @At("TAIL"))
     private static void onServerTick(Level world, BlockPos pos, BlockState state, AbstractFurnaceBlockEntity blockEntity, CallbackInfo ci) {
         if (!GarrettMod.CONFIG.enableGunpowderExplosions) return;
-        if (((FurnaceGunpowderMixin) (Object) blockEntity).litTime <= 0) return;
+        if (!state.getValue(BlockStateProperties.LIT)) return;
 
         ItemStack inputStack = blockEntity.getItem(0);
         if (inputStack.is(Items.GUNPOWDER)) {
