@@ -107,7 +107,7 @@ public class GunpowderBlock extends Block {
                     stack.shrink(1);
                 }
             }
-            return ItemInteractionResult.sidedSyncedSuccess(world.isClientSide());
+            return ItemInteractionResult.SUCCESS;
         }
         return super.useItemOn(stack, state, world, pos, player, hand, hit);
     }
