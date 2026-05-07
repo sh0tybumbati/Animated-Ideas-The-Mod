@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,27 +60,21 @@ public class GarrettMod implements ModInitializer {
 			BlockState state = world.getBlockState(hitResult.getBlockPos());
 			if (state.is(Blocks.ANVIL) || state.is(Blocks.CHIPPED_ANVIL) || state.is(Blocks.DAMAGED_ANVIL)) {
 				ItemStack stack = player.getItemInHand(hand);
-				if (stack.is(Items.IRON_INGOT) || stack.is(Items.IRON_BLOCK)) {
-					Block repairTarget = null;
+				Block repairTarget = null;
+				if (stack.is(Items.IRON_BLOCK)) {
+					if (!state.is(Blocks.ANVIL)) repairTarget = Blocks.ANVIL;
+				} else if (stack.is(Items.IRON_INGOT)) {
 					if (state.is(Blocks.DAMAGED_ANVIL)) repairTarget = Blocks.CHIPPED_ANVIL;
 					else if (state.is(Blocks.CHIPPED_ANVIL)) repairTarget = Blocks.ANVIL;
-					else if (state.is(Blocks.ANVIL) && stack.is(Items.IRON_BLOCK)) return InteractionResult.PASS;
-
-					if (repairTarget != null) {
-						if (!world.isClientSide()) {
-							world.setBlock(hitResult.getBlockPos(), repairTarget.defaultBlockState(), 3);
-							if (!player.isCreative()) stack.shrink(1);
-							world.levelEvent(1031, hitResult.getBlockPos(), 0);
-						}
-						return InteractionResult.sidedSuccess(world.isClientSide());
-					} else if (stack.is(Items.IRON_BLOCK)) {
-						if (!world.isClientSide()) {
-							world.setBlock(hitResult.getBlockPos(), Blocks.ANVIL.defaultBlockState(), 3);
-							if (!player.isCreative()) stack.shrink(1);
-							world.levelEvent(1031, hitResult.getBlockPos(), 0);
-						}
-						return InteractionResult.sidedSuccess(world.isClientSide());
+				}
+				if (repairTarget != null) {
+					if (!world.isClientSide()) {
+						var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+						world.setBlock(hitResult.getBlockPos(), repairTarget.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing), 3);
+						if (!player.isCreative()) stack.shrink(1);
+						world.levelEvent(1031, hitResult.getBlockPos(), 0);
 					}
+					return InteractionResult.sidedSuccess(world.isClientSide());
 				}
 			}
 			return InteractionResult.PASS;

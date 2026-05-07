@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:block/tinted_cross",
-  "textures": {
-    "cross": "garrettmod:block/gunpowder_lit"
-  }
+  "parent": "minecraft:block/redstone_dust_dot"
 }
