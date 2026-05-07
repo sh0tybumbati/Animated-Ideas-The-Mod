@@ -40,24 +40,27 @@ loom {
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	// Correctly declare Yarn mappings using the loom object within dependencies
-	mappings loom.yarn("net.fabricmc:yarn:1.21+build.1:v2")
-	
-	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        // To change the versions see the gradle.properties file
+        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        
+        // Correctly declare Yarn mappings (no loom.yarn wrapper needed)
+        mappings "net.fabricmc:yarn:1.21+build.1:v2"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        // These MUST be modImplementation, not just implementation
+        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Cloth Config
-	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
-		exclude(group: "net.fabricmc.fabric-api")
-	}
+        // Fabric API
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	// Mod Menu
-	modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+        // Cloth Config
+        modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+                exclude(group: "net.fabricmc.fabric-api")
+        }
+
+        // Mod Menu
+        modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 }
+
 
 processResources {
 	def version = project.version
@@ -69,15 +72,16 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 25
+        it.options.release = 21 // Minecraft 1.21 uses Java 21
 }
 
 java {
-	withSourcesJar()
+        withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_25
-	targetCompatibility = JavaVersion.VERSION_25
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
 }
+
 
 jar {
 	def projectName = project.name
