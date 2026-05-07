@@ -2,7 +2,9 @@
 	"required": true,
 	"package": "com.garrett.mod.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [],
+	"mixins": [
+		"FurnaceGunpowderMixin"
+	],
 	"injectors": {
 		"defaultRequire": 1
 	}
