@@ -3,27 +3,26 @@ plugins {
     id 'maven-publish'
 }
 
-
 version = project.mod_version
 group = project.maven_group
 
 repositories {
-	maven { url "https://maven.shedaniel.me/" }
-	maven { url "https://maven.terraformersmc.com/releases/" }
+        maven { url "https://maven.shedaniel.me/" }
+        maven { url "https://maven.terraformersmc.com/releases/" }
     mavenCentral()
     gradlePluginPortal()
 }
 
 loom {
-	splitEnvironmentSourceSets()
-    
-	mods {
-		"${project.mod_id}" {
-			sourceSet sourceSets.main
-			sourceSet sourceSets.client
-		}
-	}
-    
+        splitEnvironmentSourceSets()
+
+        mods {
+                "${project.mod_id}" {
+                        sourceSet sourceSets.main
+                        sourceSet sourceSets.client
+                }
+        }
+
     runs {
         client {
             client()
@@ -43,62 +42,57 @@ loom {
 dependencies {
         // To change the versions see the gradle.properties file
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
-        
-        // Use the native add() method to safely assign mappings in Gradle 9
-        add("mappings", "net.fabricmc:yarn:1.21+build.1:v2")
 
-        modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        // NO MAPPINGS! Minecraft 26.1+ is unobfuscated, so Loom does not use mappings here.
 
-        // Fabric API
-        modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+        // In Fabric 26.1+, 'modImplementation' is replaced with standard 'implementation'
+        implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-        // Cloth Config
-        modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+        // Cloth Config ('modApi' becomes 'api')
+        api("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
                 exclude(group: "net.fabricmc.fabric-api")
         }
 
         // Mod Menu
-        modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
+        implementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 }
 
-
-
 processResources {
-	def version = project.version
-	inputs.property "version", version
+        def version = project.version
+        inputs.property "version", version
 
-	filesMatching("fabric.mod.json") {
-		expand "version": version
-	}
+        filesMatching("fabric.mod.json") {
+                expand "version": version
+        }
 }
 
 tasks.withType(JavaCompile).configureEach {
-        it.options.release = 21 // Minecraft 1.21 uses Java 21
+        it.options.release = 25 // Minecraft 26.1+ requires Java 25 minimum
 }
 
 java {
         withSourcesJar()
 
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
 }
 
-
 jar {
-	def projectName = project.name
-	inputs.property "projectName", projectName
+        def projectName = project.name
+        inputs.property "projectName", projectName
 
-	from("LICENSE") {
-		rename { "${it}_$projectName"}
-	}
+        from("LICENSE") {
+                rename { "${it}_$projectName"}
+        }
 }
 
 publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			from components.java
-		}
-	}
-	repositories {
-	}
+        publications {
+                create("mavenJava", MavenPublication) {
+                        from components.java
+                }
+        }
+        repositories {
+        }
 }
