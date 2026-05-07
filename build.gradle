@@ -1,7 +1,8 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version '1.16-SNAPSHOT' // Use the -remap plugin for 1.21
+    id 'net.fabricmc.fabric-loom' version '1.16-SNAPSHOT'
     id 'maven-publish'
 }
+
 
 version = project.mod_version
 group = project.maven_group
@@ -43,7 +44,9 @@ dependencies {
         // To change the versions see the gradle.properties file
         minecraft "com.mojang:minecraft:${project.minecraft_version}"
         
-        // These MUST be modImplementation, not just implementation
+        // Use the native add() method to safely assign mappings in Gradle 9
+        add("mappings", "net.fabricmc:yarn:1.21+build.1:v2")
+
         modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
         // Fabric API
@@ -57,6 +60,7 @@ dependencies {
         // Mod Menu
         modImplementation "com.terraformersmc:modmenu:${project.mod_menu_version}"
 }
+
 
 
 processResources {
