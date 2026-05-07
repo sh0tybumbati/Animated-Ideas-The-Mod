@@ -9,6 +9,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -28,12 +30,17 @@ public class GarrettMod implements ModInitializer {
 		BlockBehaviour.Properties.of().noOcclusion().instabreak()
 	);
 
+	public static final Item SANDWICH = new Item(new Item.Properties()
+		.food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.8f).build())
+	);
+
 	@Override
 	public void onInitialize() {
 		AutoConfig.register(GarrettModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(GarrettModConfig.class).getConfig();
 
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "gunpowder_block"), GUNPOWDER_BLOCK);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sandwich"), SANDWICH);
 
 		// Placeable Gunpowder
 		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
