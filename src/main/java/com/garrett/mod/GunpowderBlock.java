@@ -2,7 +2,10 @@ package com.garrett.mod;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -70,19 +73,26 @@ public class GunpowderBlock extends Block {
     private void checkIgnition(Level world, BlockPos pos, BlockState state) {
         if (!state.getValue(LIT) && world.hasNeighborSignal(pos)) {
             world.setBlock(pos, state.setValue(LIT, true), 3);
-            world.scheduleTick(pos, this, 2);
+            world.scheduleTick(pos, this, 20);
+            if (!world.isClientSide()) {
+                world.playSound(null, pos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
+            }
         }
     }
 
     @Override
     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
         if (!state.getValue(LIT)) return;
+        double cx = pos.getX() + 0.5, cy = pos.getY() + 0.1, cz = pos.getZ() + 0.5;
+        world.sendParticles(ParticleTypes.SMOKE, cx, cy, cz, 4, 0.2, 0.1, 0.2, 0.02);
+        world.sendParticles(ParticleTypes.FLAME, cx, cy, cz, 2, 0.1, 0.05, 0.1, 0.01);
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             BlockPos neighborPos = pos.relative(direction);
             BlockState neighborState = world.getBlockState(neighborPos);
             if (neighborState.is(this) && !neighborState.getValue(LIT)) {
                 world.setBlock(neighborPos, neighborState.setValue(LIT, true), 3);
-                world.scheduleTick(neighborPos, this, 2);
+                world.scheduleTick(neighborPos, this, 20);
+                world.playSound(null, neighborPos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
             } else if (neighborState.is(Blocks.TNT)) {
                 world.explode(null, neighborPos.getX() + 0.5, neighborPos.getY() + 0.5, neighborPos.getZ() + 0.5, 4.0F, Level.ExplosionInteraction.TNT);
                 world.removeBlock(neighborPos, false);
@@ -99,7 +109,10 @@ public class GunpowderBlock extends Block {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if ((stack.is(Items.FLINT_AND_STEEL) || stack.is(Items.FIRE_CHARGE)) && !state.getValue(LIT)) {
             world.setBlock(pos, state.setValue(LIT, true), 3);
-            world.scheduleTick(pos, this, 2);
+            world.scheduleTick(pos, this, 20);
+            if (!world.isClientSide()) {
+                world.playSound(null, pos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
+            }
             if (!player.isCreative()) {
                 if (stack.is(Items.FLINT_AND_STEEL)) {
                     stack.hurtAndBreak(1, player, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
