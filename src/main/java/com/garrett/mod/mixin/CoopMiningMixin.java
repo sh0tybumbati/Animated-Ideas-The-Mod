@@ -44,7 +44,7 @@ public class CoopMiningMixin {
         }
 
         if (bonus > 0) {
-            self.setDestroyProgressStart(self.getDestroyProgressStart() + bonus);
+            self.setDestroyProgress(self.getDestroyProgress() + bonus);
         }
     }
 }
