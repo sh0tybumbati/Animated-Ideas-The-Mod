@@ -6,7 +6,8 @@
 		"FurnaceGunpowderMixin",
 		"ServerPlayerGameModeAccessor",
 		"CoopMiningMixin",
-		"BlockStateCoopMixin"
+		"BlockStateCoopMixin",
+		"LogicalCraftingMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

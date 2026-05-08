@@ -15,6 +15,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -75,6 +76,14 @@ public class CanvasBlock extends BaseEntityBlock {
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction face = context.getClickedFace();
+        if (!face.getAxis().isHorizontal()) return null;
+        BlockState state = defaultBlockState().setValue(FACING, face).setValue(WAXED, false);
+        return state.canSurvive(context.getLevel(), context.getClickedPos()) ? state : null;
     }
 
     @Override

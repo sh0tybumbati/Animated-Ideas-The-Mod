@@ -19,8 +19,8 @@ public class GarrettModClient implements ClientModInitializer {
 		BlockRenderLayerMap.INSTANCE.putBlock(GarrettMod.GUNPOWDER_BLOCK, RenderType.cutout());
 
 		var milkRenderHandler = new SimpleFluidRenderHandler(
-			ResourceLocation.fromNamespaceAndPath("minecraft", "block/water_still"),
-			ResourceLocation.fromNamespaceAndPath("minecraft", "block/water_flow"),
+			ResourceLocation.fromNamespaceAndPath("minecraft", "block/white_concrete"),
+			ResourceLocation.fromNamespaceAndPath("minecraft", "block/white_concrete"),
 			0xFFFFFF
 		);
 		FluidRenderHandlerRegistry.INSTANCE.register(GarrettMod.MILK_FLUID_STILL, milkRenderHandler);
