@@ -11,6 +11,4 @@ public interface ServerPlayerGameModeAccessor {
     @Accessor("player") ServerPlayer getPlayer();
     @Accessor("isDestroyingBlock") boolean isDestroyingBlock();
     @Accessor("destroyPos") BlockPos getDestroyPos();
-    @Accessor("destroyProgress") float getDestroyProgress();
-    @Accessor("destroyProgress") void setDestroyProgress(float value);
 }
