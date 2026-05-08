@@ -50,7 +50,7 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
         Direction facing = state.getValue(CanvasBlock.FACING);
         byte[] pixels = entity.getPixels();
         BlockPos pos = entity.getBlockPos().immutable();
-        int bgAbgr = DYE_ABGR[canvas.color.getId()];
+        int bgAbgr = canvas.transparent ? 0x00000000 : DYE_ABGR[canvas.color.getId()];
 
         // Get or create a DynamicTexture for this canvas position
         DynamicTexture tex = TEXTURES.computeIfAbsent(pos, p -> new DynamicTexture(16, 16, false));
@@ -66,6 +66,7 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
             for (int py = 0; py < 16; py++) {
                 for (int px = 0; px < 16; px++) {
                     byte id = pixels[py * 16 + px];
+                    // id == -1 means unpainted: use background (transparent for cobweb canvas)
                     int abgr = (id >= 0 && id < 16) ? DYE_ABGR[id] : bgAbgr;
                     img.setPixelRGBA(px, py, abgr);
                 }
@@ -77,7 +78,10 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
         poseStack.pushPose();
         setupFacingTransform(poseStack, facing);
 
-        VertexConsumer v = bufferSource.getBuffer(RenderType.entitySolid(texLoc));
+        RenderType renderType = canvas.transparent
+                ? RenderType.entityTranslucentCull(texLoc)
+                : RenderType.entitySolid(texLoc);
+        VertexConsumer v = bufferSource.getBuffer(renderType);
         Matrix4f pose = poseStack.last().pose();
         PoseStack.Pose lp = poseStack.last();
         float z = 14.0f / 16.0f;

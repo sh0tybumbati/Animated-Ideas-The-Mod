@@ -17,5 +17,6 @@
   "block.garrettmod.brown_canvas": "Brown Canvas",
   "block.garrettmod.green_canvas": "Green Canvas",
   "block.garrettmod.red_canvas": "Red Canvas",
-  "block.garrettmod.black_canvas": "Black Canvas"
+  "block.garrettmod.black_canvas": "Black Canvas",
+  "block.garrettmod.transparent_canvas": "Transparent Canvas"
 }

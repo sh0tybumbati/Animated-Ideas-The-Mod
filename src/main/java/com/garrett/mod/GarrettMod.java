@@ -53,6 +53,7 @@ public class GarrettMod implements ModInitializer {
 	);
 
 	public static final Map<DyeColor, CanvasBlock> CANVAS_BLOCKS = new EnumMap<>(DyeColor.class);
+	public static CanvasBlock TRANSPARENT_CANVAS;
 	public static BlockEntityType<CanvasBlockEntity> CANVAS_BLOCK_ENTITY_TYPE;
 
 	static {
@@ -61,6 +62,9 @@ public class GarrettMod implements ModInitializer {
 				BlockBehaviour.Properties.of().noOcclusion().strength(0.5f).noLootTable()
 			));
 		}
+		TRANSPARENT_CANVAS = new CanvasBlock(null, true,
+			BlockBehaviour.Properties.of().noOcclusion().strength(0.5f).noLootTable()
+		);
 	}
 
 	@Override
@@ -74,8 +78,8 @@ public class GarrettMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_block"), MILK_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sandwich"), SANDWICH);
 
-		// Register all 16 canvas blocks and items
-		CanvasBlock[] canvasBlockArray = new CanvasBlock[16];
+		// Register all 16 colored canvas blocks and items
+		CanvasBlock[] canvasBlockArray = new CanvasBlock[17];
 		for (DyeColor color : DyeColor.values()) {
 			CanvasBlock block = CANVAS_BLOCKS.get(color);
 			String name = color.getName() + "_canvas";
@@ -84,6 +88,11 @@ public class GarrettMod implements ModInitializer {
 				new CanvasBlockItem(block, new Item.Properties()));
 			canvasBlockArray[color.getId()] = block;
 		}
+		// Transparent canvas (cobweb recipe)
+		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "transparent_canvas"), TRANSPARENT_CANVAS);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "transparent_canvas"),
+			new CanvasBlockItem(TRANSPARENT_CANVAS, new Item.Properties()));
+		canvasBlockArray[16] = TRANSPARENT_CANVAS;
 
 		CANVAS_BLOCK_ENTITY_TYPE = Registry.register(
 			BuiltInRegistries.BLOCK_ENTITY_TYPE,

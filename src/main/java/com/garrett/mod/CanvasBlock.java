@@ -42,16 +42,22 @@ public class CanvasBlock extends BaseEntityBlock {
     private static final VoxelShape SHAPE_EAST  = Block.box(0, 0, 0, 2, 16, 16);
     private static final VoxelShape SHAPE_WEST  = Block.box(14, 0, 0, 16, 16, 16);
 
-    public final DyeColor color;
+    public final DyeColor color;     // null for transparent variant
+    public final boolean transparent;
 
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
-        return simpleCodec(p -> new CanvasBlock(color, p));
+        return simpleCodec(p -> new CanvasBlock(color, transparent, p));
     }
 
     public CanvasBlock(DyeColor color, BlockBehaviour.Properties properties) {
+        this(color, false, properties);
+    }
+
+    public CanvasBlock(DyeColor color, boolean transparent, BlockBehaviour.Properties properties) {
         super(properties);
         this.color = color;
+        this.transparent = transparent;
         registerDefaultState(stateDefinition.any()
             .setValue(FACING, Direction.NORTH)
             .setValue(WAXED, false));
