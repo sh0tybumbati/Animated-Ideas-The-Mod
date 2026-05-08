@@ -48,7 +48,7 @@ public class GarrettMod implements ModInitializer {
 	public static final FlowingFluid MILK_FLUID_FLOWING = new MilkFluid.Flowing();
 	public static final Block MILK_BLOCK = new MilkLiquidBlock(
 		MILK_FLUID_STILL,
-		BlockBehaviour.Properties.of().noCollision().strength(100.0f).liquid()
+		BlockBehaviour.Properties.of().noCollission().strength(100.0f).liquid()
 			.pushReaction(PushReaction.DESTROY).replaceable().noLootTable()
 	);
 

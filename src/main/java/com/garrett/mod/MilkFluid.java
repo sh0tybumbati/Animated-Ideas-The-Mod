@@ -2,7 +2,7 @@ package com.garrett.mod;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -27,7 +27,7 @@ public abstract class MilkFluid extends FlowingFluid {
     public Item getBucket() { return Items.MILK_BUCKET; }
 
     @Override
-    protected boolean canConvertToSource(ServerLevel level) { return false; }
+    protected boolean canConvertToSource(Level level) { return false; }
 
     @Override
     protected void beforeDestroyingBlock(LevelAccessor level, BlockPos pos, BlockState state) {}

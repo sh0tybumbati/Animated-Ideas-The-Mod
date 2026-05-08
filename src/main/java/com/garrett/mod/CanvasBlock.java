@@ -1,5 +1,6 @@
 package com.garrett.mod;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -41,6 +42,11 @@ public class CanvasBlock extends BaseEntityBlock {
     private static final VoxelShape SHAPE_WEST  = Block.box(14, 0, 0, 16, 16, 16);
 
     public final DyeColor color;
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return simpleCodec(p -> new CanvasBlock(color, p));
+    }
 
     public CanvasBlock(DyeColor color, BlockBehaviour.Properties properties) {
         super(properties);
@@ -139,7 +145,7 @@ public class CanvasBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof CanvasBlockEntity canvas) {
             ItemStack drop = CanvasBlockItem.createFilledStack(this, canvas);
             ItemEntity entity = new ItemEntity(level,
@@ -147,7 +153,7 @@ public class CanvasBlock extends BaseEntityBlock {
             entity.setDefaultPickUpDelay();
             level.addFreshEntity(entity);
         }
-        super.playerWillDestroy(level, pos, state, player);
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override
