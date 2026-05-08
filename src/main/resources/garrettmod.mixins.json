@@ -3,7 +3,9 @@
 	"package": "com.garrett.mod.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"FurnaceGunpowderMixin"
+		"FurnaceGunpowderMixin",
+		"ServerPlayerGameModeAccessor",
+		"CoopMiningMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

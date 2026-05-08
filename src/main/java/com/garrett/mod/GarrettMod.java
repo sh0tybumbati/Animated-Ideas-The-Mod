@@ -21,10 +21,15 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class GarrettMod implements ModInitializer {
 	public static final String MOD_ID = "garrettmod";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static GarrettModConfig CONFIG;
+	public static final Map<UUID, BlockPos> playerMiningPos = new HashMap<>();
 
 	public static final Block GUNPOWDER_BLOCK = new GunpowderBlock(
 		BlockBehaviour.Properties.of().noOcclusion().instabreak()
