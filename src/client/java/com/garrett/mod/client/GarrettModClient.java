@@ -11,7 +11,6 @@ public class GarrettModClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		BlockRenderLayerMap.INSTANCE.putBlock(GarrettMod.GUNPOWDER_BLOCK, RenderType.cutout());
-		BlockRenderLayerMap.INSTANCE.putBlock(GarrettMod.MILK_BLOCK, RenderType.translucent());
 		ColorProviderRegistry.BLOCK.register(
 			(state, world, pos, tintIndex) -> state.getValue(GunpowderBlock.LIT) ? 0xFFAA00 : 0x777777,
 			GarrettMod.GUNPOWDER_BLOCK
