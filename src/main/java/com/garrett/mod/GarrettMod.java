@@ -18,6 +18,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.PushReaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +41,12 @@ public class GarrettMod implements ModInitializer {
 		.food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.8f).build())
 	);
 
-	public static final Block MILK_BLOCK = new MilkBlock(
-		BlockBehaviour.Properties.of().noCollision().noOcclusion().strength(100.0f).replaceable()
+	public static final FlowingFluid MILK_FLUID_STILL = new MilkFluid.Source();
+	public static final FlowingFluid MILK_FLUID_FLOWING = new MilkFluid.Flowing();
+	public static final Block MILK_BLOCK = new MilkLiquidBlock(
+		MILK_FLUID_STILL,
+		BlockBehaviour.Properties.of().noCollision().strength(100.0f).liquid()
+			.pushReaction(PushReaction.DESTROY).replaceable().noLootTable()
 	);
 
 	@Override
@@ -49,6 +55,8 @@ public class GarrettMod implements ModInitializer {
 		CONFIG = AutoConfig.getConfigHolder(GarrettModConfig.class).getConfig();
 
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "gunpowder_block"), GUNPOWDER_BLOCK);
+		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk"), MILK_FLUID_STILL);
+		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "flowing_milk"), MILK_FLUID_FLOWING);
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_block"), MILK_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sandwich"), SANDWICH);
 
