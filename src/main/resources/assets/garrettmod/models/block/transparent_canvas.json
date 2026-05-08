@@ -16,8 +16,8 @@
   ],
   "textures": {
     "front": "garrettmod:block/canvas_front",
-    "back":  "garrettmod:block/canvas_back",
-    "side":  "minecraft:block/oak_planks",
-    "particle": "minecraft:block/oak_planks"
+    "back":  "minecraft:block/glass",
+    "side":  "minecraft:block/glass",
+    "particle": "minecraft:block/glass"
   }
 }
