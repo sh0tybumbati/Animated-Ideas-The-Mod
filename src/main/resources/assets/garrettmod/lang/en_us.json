@@ -1,5 +1,21 @@
 {
   "item.garrettmod.sandwich": "Sandwich",
   "block.garrettmod.gunpowder_block": "Gunpowder",
-  "block.garrettmod.milk_block": "Milk"
+  "block.garrettmod.milk_block": "Milk",
+  "block.garrettmod.white_canvas": "White Canvas",
+  "block.garrettmod.orange_canvas": "Orange Canvas",
+  "block.garrettmod.magenta_canvas": "Magenta Canvas",
+  "block.garrettmod.light_blue_canvas": "Light Blue Canvas",
+  "block.garrettmod.yellow_canvas": "Yellow Canvas",
+  "block.garrettmod.lime_canvas": "Lime Canvas",
+  "block.garrettmod.pink_canvas": "Pink Canvas",
+  "block.garrettmod.gray_canvas": "Gray Canvas",
+  "block.garrettmod.light_gray_canvas": "Light Gray Canvas",
+  "block.garrettmod.cyan_canvas": "Cyan Canvas",
+  "block.garrettmod.purple_canvas": "Purple Canvas",
+  "block.garrettmod.blue_canvas": "Blue Canvas",
+  "block.garrettmod.brown_canvas": "Brown Canvas",
+  "block.garrettmod.green_canvas": "Green Canvas",
+  "block.garrettmod.red_canvas": "Red Canvas",
+  "block.garrettmod.black_canvas": "Black Canvas"
 }

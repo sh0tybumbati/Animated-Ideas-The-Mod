@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:block/block",
+  "elements": [
+    {
+      "from": [0, 0, 14],
+      "to": [16, 16, 16],
+      "faces": {
+        "north": { "texture": "#front", "cullface": "north" },
+        "south": { "texture": "#back",  "cullface": "south" },
+        "east":  { "texture": "#side",  "cullface": "east" },
+        "west":  { "texture": "#side",  "cullface": "west" },
+        "up":    { "texture": "#side",  "cullface": "up" },
+        "down":  { "texture": "#side",  "cullface": "down" }
+      }
+    }
+  ],
+  "textures": {
+    "front": "garrettmod:block/canvas_front",
+    "back":  "garrettmod:block/canvas_back",
+    "side":  "garrettmod:block/canvas_side",
+    "particle": "garrettmod:block/canvas_side"
+  }
+}

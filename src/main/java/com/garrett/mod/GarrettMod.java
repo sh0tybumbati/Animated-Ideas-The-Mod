@@ -10,11 +10,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.material.PushReaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -49,6 +52,17 @@ public class GarrettMod implements ModInitializer {
 			.pushReaction(PushReaction.DESTROY).replaceable().noLootTable()
 	);
 
+	public static final Map<DyeColor, CanvasBlock> CANVAS_BLOCKS = new EnumMap<>(DyeColor.class);
+	public static BlockEntityType<CanvasBlockEntity> CANVAS_BLOCK_ENTITY_TYPE;
+
+	static {
+		for (DyeColor color : DyeColor.values()) {
+			CANVAS_BLOCKS.put(color, new CanvasBlock(color,
+				BlockBehaviour.Properties.of().noOcclusion().strength(0.5f).noLootTable()
+			));
+		}
+	}
+
 	@Override
 	public void onInitialize() {
 		AutoConfig.register(GarrettModConfig.class, GsonConfigSerializer::new);
@@ -59,6 +73,23 @@ public class GarrettMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "flowing_milk"), MILK_FLUID_FLOWING);
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_block"), MILK_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sandwich"), SANDWICH);
+
+		// Register all 16 canvas blocks and items
+		CanvasBlock[] canvasBlockArray = new CanvasBlock[16];
+		for (DyeColor color : DyeColor.values()) {
+			CanvasBlock block = CANVAS_BLOCKS.get(color);
+			String name = color.getName() + "_canvas";
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), block);
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, name),
+				new CanvasBlockItem(block, new Item.Properties()));
+			canvasBlockArray[color.getId()] = block;
+		}
+
+		CANVAS_BLOCK_ENTITY_TYPE = Registry.register(
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "canvas"),
+			BlockEntityType.Builder.of(CanvasBlockEntity::new, canvasBlockArray).build(null)
+		);
 
 		// Placeable Gunpowder
 		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
