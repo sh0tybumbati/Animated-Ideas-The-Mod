@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:bread" },
+    { "item": "minecraft:bread" },
+    { "item": "minecraft:cooked_rabbit" }
+  ],
+  "result": { "id": "garrettmod:rabbit_sandwich", "count": 1 }
+}

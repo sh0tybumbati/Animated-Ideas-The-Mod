@@ -5,19 +5,17 @@
       "from": [0, 0, 14],
       "to": [16, 16, 16],
       "faces": {
-        "north": { "texture": "#front", "cullface": "north" },
-        "south": { "texture": "#back",  "cullface": "south" },
-        "east":  { "texture": "#side",  "cullface": "east" },
-        "west":  { "texture": "#side",  "cullface": "west" },
-        "up":    { "texture": "#side",  "cullface": "up" },
-        "down":  { "texture": "#side",  "cullface": "down" }
+        "south": { "texture": "#back", "cullface": "south" },
+        "east":  { "texture": "#side", "cullface": "east" },
+        "west":  { "texture": "#side", "cullface": "west" },
+        "up":    { "texture": "#side", "cullface": "up" },
+        "down":  { "texture": "#side", "cullface": "down" }
       }
     }
   ],
   "textures": {
-    "front": "garrettmod:block/canvas_front",
-    "back":  "minecraft:block/glass",
-    "side":  "minecraft:block/glass",
+    "back":     "minecraft:block/glass",
+    "side":     "minecraft:block/glass",
     "particle": "minecraft:block/glass"
   }
 }

@@ -1,5 +1,4 @@
 {
-  "item.garrettmod.sandwich": "Sandwich",
   "block.garrettmod.gunpowder_block": "Gunpowder",
   "block.garrettmod.milk_block": "Milk",
   "block.garrettmod.white_canvas": "White Canvas",
@@ -18,5 +17,35 @@
   "block.garrettmod.green_canvas": "Green Canvas",
   "block.garrettmod.red_canvas": "Red Canvas",
   "block.garrettmod.black_canvas": "Black Canvas",
-  "block.garrettmod.transparent_canvas": "Transparent Canvas"
+  "block.garrettmod.transparent_canvas": "Transparent Canvas",
+
+  "item.garrettmod.beef_sandwich": "Beef Sandwich",
+  "item.garrettmod.pork_sandwich": "Pork Sandwich",
+  "item.garrettmod.chicken_sandwich": "Chicken Sandwich",
+  "item.garrettmod.mutton_sandwich": "Mutton Sandwich",
+  "item.garrettmod.rabbit_sandwich": "Rabbit Sandwich",
+  "item.garrettmod.salmon_sandwich": "Salmon Sandwich",
+  "item.garrettmod.cod_sandwich": "Cod Sandwich",
+
+  "text.autoconfig.garrettmod.title": "GTC's Animated Ideas Config",
+  "text.autoconfig.garrettmod.option.enableSandwiches": "Sandwiches",
+  "text.autoconfig.garrettmod.option.enableSandwiches.@Tooltip": "Enable sandwich food items crafted from bread and cooked meat.",
+  "text.autoconfig.garrettmod.option.enableCanvases": "Paintable Canvases",
+  "text.autoconfig.garrettmod.option.enableCanvases.@Tooltip": "Enable wall-mounted canvases you can paint on with dyes.",
+  "text.autoconfig.garrettmod.option.enablePlaceableGunpowder": "Placeable Gunpowder",
+  "text.autoconfig.garrettmod.option.enablePlaceableGunpowder.@Tooltip": "Allow right-clicking to place gunpowder as a block.",
+  "text.autoconfig.garrettmod.option.enableGunpowderExplosions": "Gunpowder Block Explosions",
+  "text.autoconfig.garrettmod.option.enableGunpowderExplosions.@Tooltip": "Gunpowder blocks explode when ignited.",
+  "text.autoconfig.garrettmod.option.enablePlaceableMilk": "Placeable Milk",
+  "text.autoconfig.garrettmod.option.enablePlaceableMilk.@Tooltip": "Allow pouring milk buckets into the world as a flowing fluid.",
+  "text.autoconfig.garrettmod.option.enableRepairableAnvils": "Repairable Anvils",
+  "text.autoconfig.garrettmod.option.enableRepairableAnvils.@Tooltip": "Right-click damaged or chipped anvils with iron ingots to repair them.",
+  "text.autoconfig.garrettmod.option.enableLogicalStairs": "Logical Stair Crafting",
+  "text.autoconfig.garrettmod.option.enableLogicalStairs.@Tooltip": "Crafting stairs refunds the leftover planks (net cost 3 instead of 6).",
+  "text.autoconfig.garrettmod.option.enableLogicalTrapdoors": "Logical Trapdoor Crafting",
+  "text.autoconfig.garrettmod.option.enableLogicalTrapdoors.@Tooltip": "Crafting trapdoors gives a full stack of 2 extra (12 total instead of 2).",
+  "text.autoconfig.garrettmod.option.enableCoopMining": "Co-op Mining Speed",
+  "text.autoconfig.garrettmod.option.enableCoopMining.@Tooltip": "Multiple players hitting the same block mine it faster together.",
+  "text.autoconfig.garrettmod.option.enableParrotArmorStands": "Parrots on Armor Stands",
+  "text.autoconfig.garrettmod.option.enableParrotArmorStands.@Tooltip": "Allow parrots to perch on armor stands."
 }

@@ -86,11 +86,11 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
         PoseStack.Pose lp = poseStack.last();
         float z = 14.0f / 16.0f;
 
-        // CCW winding viewed from front (-Z in NORTH orientation) so the front face is visible
-        v.addVertex(pose, 0, 1, z).setColor(1f,1f,1f,1f).setUv(0,0).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
-        v.addVertex(pose, 1, 1, z).setColor(1f,1f,1f,1f).setUv(1,0).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
-        v.addVertex(pose, 1, 0, z).setColor(1f,1f,1f,1f).setUv(1,1).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
-        v.addVertex(pose, 0, 0, z).setColor(1f,1f,1f,1f).setUv(0,1).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        // CCW winding viewed from front; U flipped so east is on the player's right
+        v.addVertex(pose, 0, 1, z).setColor(1f,1f,1f,1f).setUv(1,0).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        v.addVertex(pose, 1, 1, z).setColor(1f,1f,1f,1f).setUv(0,0).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        v.addVertex(pose, 1, 0, z).setColor(1f,1f,1f,1f).setUv(0,1).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        v.addVertex(pose, 0, 0, z).setColor(1f,1f,1f,1f).setUv(1,1).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
 
         poseStack.popPose();
     }

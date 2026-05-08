@@ -34,6 +34,14 @@ public class GarrettModClient implements ClientModInitializer {
 		for (DyeColor color : DyeColor.values()) {
 			BlockRenderLayerMap.INSTANCE.putBlock(GarrettMod.CANVAS_BLOCKS.get(color), RenderType.cutout());
 		}
+		BlockRenderLayerMap.INSTANCE.putBlock(GarrettMod.TRANSPARENT_CANVAS, RenderType.translucent());
+
+		ColorProviderRegistry.BLOCK.register((state, world, pos, tintIndex) -> {
+			if (state.getBlock() instanceof CanvasBlock canvas && canvas.color != null) {
+				return canvas.color.getTextureDiffuseColor() | 0xFF000000;
+			}
+			return 0xFFFFFFFF;
+		}, GarrettMod.CANVAS_BLOCKS.values().toArray(new CanvasBlock[0]));
 
 		BlockEntityRenderers.register(GarrettMod.CANVAS_BLOCK_ENTITY_TYPE, CanvasBlockEntityRenderer::new);
 	}

@@ -2,10 +2,10 @@
   "schemaVersion": 1,
   "id": "garrettmod",
   "version": "${version}",
-  "name": "GarrettTheCarrotMod",
-  "description": "A Minecraft mod based on GarrettTheCarrot's 'Animating your Minecraft Ideas' series.",
+  "name": "GTC's Animated Ideas",
+  "description": "A Minecraft mod based on GarrettTheCarrot's 'Animating your Minecraft Ideas' YouTube series.",
   "authors": [
-    "GarrettTheCarrot Community"
+    "sh0tybumbati"
   ],
   "contact": {
     "sources": "https://github.com/sh0tybumbati/Animated-Ideas-The-Mod"

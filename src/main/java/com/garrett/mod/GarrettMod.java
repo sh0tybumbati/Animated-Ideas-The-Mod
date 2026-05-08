@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,9 +41,24 @@ public class GarrettMod implements ModInitializer {
 		BlockBehaviour.Properties.of().noOcclusion().instabreak()
 	);
 
-	public static final Item SANDWICH = new Item(new Item.Properties()
-		.food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.8f).build())
-	);
+	// bread(5,0.6) + bread(5,0.6) + meat → summed nutrition, weighted saturation
+	public static final Map<String, Item> SANDWICHES = new LinkedHashMap<>();
+	static {
+		record Meat(String name, int nutrition, float sat) {}
+		Meat[] meats = {
+			new Meat("beef",    18, 0.7f),
+			new Meat("pork",    18, 0.7f),
+			new Meat("chicken", 16, 0.6f),
+			new Meat("mutton",  16, 0.6f),
+			new Meat("rabbit",  15, 0.6f),
+			new Meat("salmon",  16, 0.7f),
+			new Meat("cod",     15, 0.6f),
+		};
+		for (Meat m : meats) {
+			SANDWICHES.put(m.name() + "_sandwich", new Item(new Item.Properties()
+				.food(new FoodProperties.Builder().nutrition(m.nutrition()).saturationModifier(m.sat()).build())));
+		}
+	}
 
 	public static final FlowingFluid MILK_FLUID_STILL = new MilkFluid.Source();
 	public static final FlowingFluid MILK_FLUID_FLOWING = new MilkFluid.Flowing();
@@ -76,7 +92,9 @@ public class GarrettMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk"), MILK_FLUID_STILL);
 		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "flowing_milk"), MILK_FLUID_FLOWING);
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_block"), MILK_BLOCK);
-		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sandwich"), SANDWICH);
+		for (Map.Entry<String, Item> e : SANDWICHES.entrySet()) {
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, e.getKey()), e.getValue());
+		}
 
 		// Register all 16 colored canvas blocks and items
 		CanvasBlock[] canvasBlockArray = new CanvasBlock[17];
