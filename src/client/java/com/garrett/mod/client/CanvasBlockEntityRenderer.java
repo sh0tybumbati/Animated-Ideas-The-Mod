@@ -4,26 +4,40 @@ import com.garrett.mod.CanvasBlock;
 import com.garrett.mod.CanvasBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix4f;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBlockEntity> {
 
-    private static final int[] DYE_COLORS = new int[16];
+    // ABGR for NativeImage, indexed by DyeColor.getId()
+    private static final int[] DYE_ABGR = new int[16];
 
     static {
         for (DyeColor dye : DyeColor.values()) {
-            // getTextureDiffuseColor() returns packed 0xRRGGBB in 1.21
-            int packed = dye.getTextureDiffuseColor();
-            DYE_COLORS[dye.getId()] = (0xFF << 24) | (packed & 0xFFFFFF);
+            int rgb = dye.getTextureDiffuseColor() & 0xFFFFFF;
+            int r = (rgb >> 16) & 0xFF;
+            int g = (rgb >> 8) & 0xFF;
+            int b = rgb & 0xFF;
+            DYE_ABGR[dye.getId()] = (0xFF << 24) | (b << 16) | (g << 8) | r;
         }
     }
+
+    private static final Map<BlockPos, DynamicTexture> TEXTURES = new HashMap<>();
+    private static final Map<BlockPos, ResourceLocation> TEX_LOCS = new HashMap<>();
 
     public CanvasBlockEntityRenderer(BlockEntityRendererProvider.Context ctx) {}
 
@@ -35,56 +49,49 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
 
         Direction facing = state.getValue(CanvasBlock.FACING);
         byte[] pixels = entity.getPixels();
+        BlockPos pos = entity.getBlockPos().immutable();
+        int bgAbgr = DYE_ABGR[canvas.color.getId()];
 
-        int bgColor = DYE_COLORS[canvas.color.getId()];
+        // Get or create a DynamicTexture for this canvas position
+        DynamicTexture tex = TEXTURES.computeIfAbsent(pos, p -> new DynamicTexture(16, 16, false));
+        ResourceLocation texLoc = TEX_LOCS.computeIfAbsent(pos, p -> {
+            String name = "canvas/" + (pos.getX() + "_" + pos.getY() + "_" + pos.getZ())
+                    .replace('-', 'n');
+            return Minecraft.getInstance().getTextureManager().register(name, tex);
+        });
 
-        VertexConsumer consumer = bufferSource.getBuffer(RenderType.cutout());
+        // Write pixel data into the texture
+        var img = tex.getPixels();
+        if (img != null) {
+            for (int py = 0; py < 16; py++) {
+                for (int px = 0; px < 16; px++) {
+                    byte id = pixels[py * 16 + px];
+                    int abgr = (id >= 0 && id < 16) ? DYE_ABGR[id] : bgAbgr;
+                    img.setPixelRGBA(px, py, abgr);
+                }
+            }
+            tex.upload();
+        }
+
+        // Render a single quad covering the canvas face
         poseStack.pushPose();
         setupFacingTransform(poseStack, facing);
 
+        VertexConsumer v = bufferSource.getBuffer(RenderType.entitySolid(texLoc));
         Matrix4f pose = poseStack.last().pose();
-        PoseStack.Pose lastPose = poseStack.last();
+        PoseStack.Pose lp = poseStack.last();
+        float z = 14.0f / 16.0f;
 
-        float depth = 14.0f / 16.0f;
-
-        for (int py = 0; py < 16; py++) {
-            for (int px = 0; px < 16; px++) {
-                int idx = py * 16 + px;
-                byte colorId = pixels[idx];
-                int color = (colorId >= 0 && colorId < 16) ? DYE_COLORS[colorId] : bgColor;
-
-                float x0 = px / 16.0f;
-                float x1 = (px + 1) / 16.0f;
-                float y0 = 1.0f - (py + 1) / 16.0f;
-                float y1 = 1.0f - py / 16.0f;
-
-                float r = ((color >> 16) & 0xFF) / 255.0f;
-                float g = ((color >> 8) & 0xFF) / 255.0f;
-                float b = (color & 0xFF) / 255.0f;
-
-                vertex(consumer, pose, lastPose, x0, y1, depth, r, g, b, packedLight, packedOverlay);
-                vertex(consumer, pose, lastPose, x0, y0, depth, r, g, b, packedLight, packedOverlay);
-                vertex(consumer, pose, lastPose, x1, y0, depth, r, g, b, packedLight, packedOverlay);
-                vertex(consumer, pose, lastPose, x1, y1, depth, r, g, b, packedLight, packedOverlay);
-            }
-        }
+        v.addVertex(pose, 0, 1, z).setColor(1f,1f,1f,1f).setUv(0,0).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        v.addVertex(pose, 0, 0, z).setColor(1f,1f,1f,1f).setUv(0,1).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        v.addVertex(pose, 1, 0, z).setColor(1f,1f,1f,1f).setUv(1,1).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
+        v.addVertex(pose, 1, 1, z).setColor(1f,1f,1f,1f).setUv(1,0).setOverlay(packedOverlay).setLight(packedLight).setNormal(lp,0,0,-1);
 
         poseStack.popPose();
     }
 
-    private void vertex(VertexConsumer v, Matrix4f pose, PoseStack.Pose lastPose,
-                        float x, float y, float z, float r, float g, float b,
-                        int light, int overlay) {
-        v.addVertex(pose, x, y, z)
-         .setColor(r, g, b, 1.0f)
-         .setUv(0, 0)
-         .setOverlay(overlay)
-         .setLight(light)
-         .setNormal(lastPose, 0, 0, -1);
-    }
-
     private void setupFacingTransform(PoseStack stack, Direction facing) {
-        stack.translate(0.5f, 0.5f, 0.5f);
+        stack.translate(0.5, 0.5, 0.5);
         float yRot = switch (facing) {
             case NORTH -> 0;
             case SOUTH -> 180;
@@ -92,7 +99,7 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
             case WEST  -> 90;
             default    -> 0;
         };
-        stack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yRot));
-        stack.translate(-0.5f, -0.5f, -0.5f);
+        stack.mulPose(Axis.YP.rotationDegrees(yRot));
+        stack.translate(-0.5, -0.5, -0.5);
     }
 }
