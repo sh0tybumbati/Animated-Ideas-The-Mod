@@ -39,12 +39,17 @@ public class GarrettMod implements ModInitializer {
 		.food(new FoodProperties.Builder().nutrition(10).saturationModifier(0.8f).build())
 	);
 
+	public static final Block MILK_BLOCK = new MilkBlock(
+		BlockBehaviour.Properties.of().noCollision().noOcclusion().strength(100.0f).replaceable()
+	);
+
 	@Override
 	public void onInitialize() {
 		AutoConfig.register(GarrettModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(GarrettModConfig.class).getConfig();
 
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "gunpowder_block"), GUNPOWDER_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_block"), MILK_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sandwich"), SANDWICH);
 
 		// Placeable Gunpowder
@@ -58,6 +63,32 @@ public class GarrettMod implements ModInitializer {
 					if (!world.isClientSide()) {
 						world.setBlock(pos, GUNPOWDER_BLOCK.defaultBlockState(), 3);
 						if (!player.isCreative()) stack.shrink(1);
+					}
+					return InteractionResult.sidedSuccess(world.isClientSide());
+				}
+			}
+			return InteractionResult.PASS;
+		});
+
+		// Placeable Milk
+		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+			if (!CONFIG.enablePlaceableMilk) return InteractionResult.PASS;
+
+			ItemStack stack = player.getItemInHand(hand);
+			if (stack.is(Items.MILK_BUCKET)) {
+				BlockPos pos = hitResult.getBlockPos().relative(hitResult.getDirection());
+				if (world.getBlockState(pos).canBeReplaced()) {
+					if (!world.isClientSide()) {
+						world.setBlock(pos, MILK_BLOCK.defaultBlockState(), 3);
+						if (!player.isCreative()) {
+							stack.shrink(1);
+							ItemStack bucket = new ItemStack(Items.BUCKET);
+							if (stack.isEmpty()) {
+								player.setItemInHand(hand, bucket);
+							} else if (!player.getInventory().add(bucket)) {
+								player.drop(bucket, false);
+							}
+						}
 					}
 					return InteractionResult.sidedSuccess(world.isClientSide());
 				}
