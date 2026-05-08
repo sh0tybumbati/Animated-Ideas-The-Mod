@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -29,16 +30,26 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class GunpowderBlock extends Block {
     public static final BooleanProperty LIT = BooleanProperty.create("lit");
+    public static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+    public static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+    public static final BooleanProperty EAST = BlockStateProperties.EAST;
+    public static final BooleanProperty WEST = BlockStateProperties.WEST;
+
     protected static final VoxelShape SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 1.0, 16.0);
 
     public GunpowderBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState(this.stateDefinition.any().setValue(LIT, false));
+        this.registerDefaultState(this.stateDefinition.any()
+            .setValue(LIT, false)
+            .setValue(NORTH, false)
+            .setValue(SOUTH, false)
+            .setValue(EAST, false)
+            .setValue(WEST, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(LIT);
+        builder.add(LIT, NORTH, SOUTH, EAST, WEST);
     }
 
     @Override
@@ -46,10 +57,23 @@ public class GunpowderBlock extends Block {
         return SHAPE;
     }
 
+    private static BooleanProperty directionToProperty(Direction dir) {
+        return switch (dir) {
+            case NORTH -> NORTH;
+            case SOUTH -> SOUTH;
+            case EAST -> EAST;
+            case WEST -> WEST;
+            default -> throw new IllegalStateException("Unexpected direction: " + dir);
+        };
+    }
+
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
         if (!state.canSurvive(world, pos)) {
             return Blocks.AIR.defaultBlockState();
+        }
+        if (direction.getAxis().isHorizontal()) {
+            return state.setValue(directionToProperty(direction), neighborState.is(this));
         }
         return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     }
@@ -62,7 +86,15 @@ public class GunpowderBlock extends Block {
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.is(state.getBlock())) return;
-        checkIgnition(world, pos, state);
+        BlockState connected = state
+            .setValue(NORTH, world.getBlockState(pos.relative(Direction.NORTH)).is(this))
+            .setValue(SOUTH, world.getBlockState(pos.relative(Direction.SOUTH)).is(this))
+            .setValue(EAST, world.getBlockState(pos.relative(Direction.EAST)).is(this))
+            .setValue(WEST, world.getBlockState(pos.relative(Direction.WEST)).is(this));
+        if (!connected.equals(state)) {
+            world.setBlock(pos, connected, 2);
+        }
+        checkIgnition(world, pos, connected);
     }
 
     @Override
@@ -91,7 +123,7 @@ public class GunpowderBlock extends Block {
             BlockState neighborState = world.getBlockState(neighborPos);
             if (neighborState.is(this) && !neighborState.getValue(LIT)) {
                 world.setBlock(neighborPos, neighborState.setValue(LIT, true), 3);
-                world.scheduleTick(neighborPos, this, 20);
+                world.scheduleTick(neighborPos, this, 4);
                 world.playSound(null, neighborPos, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
             } else if (neighborState.is(Blocks.TNT)) {
                 world.explode(null, neighborPos.getX() + 0.5, neighborPos.getY() + 0.5, neighborPos.getZ() + 0.5, 4.0F, Level.ExplosionInteraction.TNT);
