@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "garrettmod",
+  "id": "gtcai",
   "version": "${version}",
   "name": "GTC's Animated Ideas",
   "description": "A Minecraft mod based on GarrettTheCarrot's 'Animating your Minecraft Ideas' YouTube series.",
@@ -11,7 +11,7 @@
     "sources": "https://github.com/sh0tybumbati/Animated-Ideas-The-Mod"
   },
   "license": "MIT",
-  "icon": "assets/garrettmod/icon.png",
+  "icon": "assets/gtcai/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -25,8 +25,8 @@
     ]
   },
   "mixins": [
-    "garrettmod.mixins.json",
-    "garrettmod.client.mixins.json"
+    "gtcai.mixins.json",
+    "gtcai.client.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.11",

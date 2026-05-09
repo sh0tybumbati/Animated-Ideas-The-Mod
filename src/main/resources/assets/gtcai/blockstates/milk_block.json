@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "level=0":  { "model": "gtcai:block/milk_block" },
+    "level=1":  { "model": "gtcai:block/milk_block" },
+    "level=2":  { "model": "gtcai:block/milk_block" },
+    "level=3":  { "model": "gtcai:block/milk_block" },
+    "level=4":  { "model": "gtcai:block/milk_block" },
+    "level=5":  { "model": "gtcai:block/milk_block" },
+    "level=6":  { "model": "gtcai:block/milk_block" },
+    "level=7":  { "model": "gtcai:block/milk_block" },
+    "level=8":  { "model": "gtcai:block/milk_block" },
+    "level=9":  { "model": "gtcai:block/milk_block" },
+    "level=10": { "model": "gtcai:block/milk_block" },
+    "level=11": { "model": "gtcai:block/milk_block" },
+    "level=12": { "model": "gtcai:block/milk_block" },
+    "level=13": { "model": "gtcai:block/milk_block" },
+    "level=14": { "model": "gtcai:block/milk_block" },
+    "level=15": { "model": "gtcai:block/milk_block" }
+  }
+}

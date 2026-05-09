@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:bread" },
+    { "item": "minecraft:bread" },
+    { "item": "minecraft:cooked_porkchop" }
+  ],
+  "result": { "id": "gtcai:pork_sandwich", "count": 1 }
+}

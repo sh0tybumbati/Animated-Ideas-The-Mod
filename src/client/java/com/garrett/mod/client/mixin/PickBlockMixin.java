@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PickBlockMixin {
 
     @Inject(method = "pickBlock", at = @At("HEAD"), cancellable = true, require = 0)
-    private void garrettmod_eyedropper(CallbackInfo ci) {
+    private void gtcai_eyedropper(CallbackInfo ci) {
         Minecraft mc = (Minecraft) (Object) this;
         if (!(mc.hitResult instanceof BlockHitResult blockHit)) return;
 

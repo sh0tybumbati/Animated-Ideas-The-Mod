@@ -1,0 +1,21 @@
+{
+  "parent": "minecraft:block/block",
+  "elements": [
+    {
+      "from": [0, 0, 14],
+      "to": [16, 16, 16],
+      "faces": {
+        "south": { "texture": "#back", "cullface": "south" },
+        "east":  { "texture": "#side", "cullface": "east",  "tintindex": 0 },
+        "west":  { "texture": "#side", "cullface": "west",  "tintindex": 0 },
+        "up":    { "texture": "#side", "cullface": "up",    "tintindex": 0 },
+        "down":  { "texture": "#side", "cullface": "down",  "tintindex": 0 }
+      }
+    }
+  ],
+  "textures": {
+    "back":     "gtcai:block/canvas_back",
+    "side":     "gtcai:block/canvas_side",
+    "particle": "gtcai:block/canvas_back"
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:crafting_shapeless",
-  "ingredients": [
-    { "item": "minecraft:bread" },
-    { "item": "minecraft:bread" },
-    { "item": "minecraft:cooked_chicken" }
-  ],
-  "result": { "id": "garrettmod:chicken_sandwich", "count": 1 }
-}

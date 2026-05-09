@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class GarrettMod implements ModInitializer {
-	public static final String MOD_ID = "garrettmod";
+	public static final String MOD_ID = "gtcai";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static GarrettModConfig CONFIG;
 	public static final Map<UUID, BlockPos> playerMiningPos = new HashMap<>();

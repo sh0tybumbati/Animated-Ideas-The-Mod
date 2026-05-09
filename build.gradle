@@ -22,7 +22,7 @@ loom {
 	splitEnvironmentSourceSets()
     
 	mods {
-		"garrettmod" {
+		"gtcai" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}
