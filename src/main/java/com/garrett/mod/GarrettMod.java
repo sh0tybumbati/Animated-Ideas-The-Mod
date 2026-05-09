@@ -5,13 +5,22 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.animal.Parrot;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
@@ -213,6 +222,39 @@ public class GarrettMod implements ModInitializer {
 			if (!world.isClientSide() && world.getBlockEntity(pos) instanceof CanvasBlockEntity be) {
 				int pixel = canvas.hitToPixel(state.getValue(CanvasBlock.FACING), blockHit.getLocation(), pos);
 				if (pixel >= 0) be.setPixel(pixel, dye.getDyeColor().getTextureDiffuseColor() & 0xFFFFFF);
+			}
+			return InteractionResult.sidedSuccess(world.isClientSide());
+		});
+
+		// Parrots on armor stands
+		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+			if (!CONFIG.enableParrotArmorStands) return InteractionResult.PASS;
+			if (world.isClientSide()) return InteractionResult.PASS;
+			if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
+			if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
+			if (!(entity instanceof ArmorStand stand)) return InteractionResult.PASS;
+
+			// Find a parrot on either shoulder
+			var left  = serverPlayer.getShoulderEntityLeft();
+			var right = serverPlayer.getShoulderEntityRight();
+			boolean onLeft = !left.isEmpty()  && "minecraft:parrot".equals(left.getString("id"));
+			boolean onRight = !right.isEmpty() && "minecraft:parrot".equals(right.getString("id"));
+			if (!onLeft && !onRight) return InteractionResult.PASS;
+
+			var tag = (onLeft ? left : right).copy();
+			ServerLevel level = (ServerLevel) world;
+			Entity spawned = EntityType.loadEntityRecursive(tag, level, e -> {
+				e.setPos(stand.getX(), stand.getY() + 1.2, stand.getZ());
+				if (e instanceof Parrot parrot) {
+					parrot.setOrderedToSit(true);
+					parrot.setInSittingPose(true);
+				}
+				return e;
+			});
+			if (spawned != null) {
+				level.addFreshEntity(spawned);
+				if (onLeft) serverPlayer.setShoulderEntityLeft(new CompoundTag());
+				else        serverPlayer.setShoulderEntityRight(new CompoundTag());
 			}
 			return InteractionResult.sidedSuccess(world.isClientSide());
 		});
