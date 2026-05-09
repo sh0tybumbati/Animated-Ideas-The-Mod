@@ -243,19 +243,18 @@ public class GarrettMod implements ModInitializer {
 
 			var tag = (onLeft ? left : right).copy();
 			ServerLevel level = (ServerLevel) world;
-			Entity spawned = EntityType.loadEntityRecursive(tag, level, e -> {
+			EntityType.loadEntityRecursive(tag, level, level.registryAccess(), e -> {
 				e.setPos(stand.getX(), stand.getY() + 1.2, stand.getZ());
 				if (e instanceof Parrot parrot) {
 					parrot.setOrderedToSit(true);
 					parrot.setInSittingPose(true);
 				}
 				return e;
-			});
-			if (spawned != null) {
-				level.addFreshEntity(spawned);
+			}).ifPresent(e -> {
+				level.addFreshEntity(e);
 				if (onLeft) serverPlayer.setShoulderEntityLeft(new CompoundTag());
 				else        serverPlayer.setShoulderEntityRight(new CompoundTag());
-			}
+			});
 			return InteractionResult.sidedSuccess(world.isClientSide());
 		});
 
