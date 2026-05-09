@@ -126,14 +126,15 @@ public class CanvasBlock extends BaseEntityBlock {
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
 
-        // Paint with brush (main hand) + dye (offhand)
+        // Blend color: brush (main hand) + dye (offhand) + right-click
         if (!state.getValue(WAXED) && stack.is(Items.BRUSH)) {
             ItemStack offhand = player.getOffhandItem();
             if (offhand.getItem() instanceof DyeItem dye) {
                 int pixel = hitToPixel(state.getValue(FACING), hit.getLocation(), pos);
                 if (pixel >= 0) {
                     if (!level.isClientSide()) {
-                        canvas.setPixel(pixel, (byte) dye.getDyeColor().getId());
+                        byte current = canvas.getPixels()[pixel];
+                        canvas.setPixel(pixel, blendColors(current, dye.getDyeColor(), this.color));
                     }
                     return ItemInteractionResult.sidedSuccess(level.isClientSide());
                 }
@@ -143,7 +144,30 @@ public class CanvasBlock extends BaseEntityBlock {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    private int hitToPixel(Direction facing, Vec3 hitPos, BlockPos blockPos) {
+    private static byte blendColors(byte existingId, DyeColor newColor, DyeColor bgColor) {
+        DyeColor existing = (existingId >= 0 && existingId < 16) ? DyeColor.byId(existingId) : bgColor;
+        if (existing == null) return (byte) newColor.getId();
+
+        int eRgb = existing.getTextureDiffuseColor();
+        int nRgb = newColor.getTextureDiffuseColor();
+        int blendR = (((eRgb >> 16) & 0xFF) + ((nRgb >> 16) & 0xFF)) / 2;
+        int blendG = (((eRgb >>  8) & 0xFF) + ((nRgb >>  8) & 0xFF)) / 2;
+        int blendB = ((eRgb & 0xFF) + (nRgb & 0xFF)) / 2;
+
+        DyeColor nearest = newColor;
+        int minDist = Integer.MAX_VALUE;
+        for (DyeColor dye : DyeColor.values()) {
+            int dRgb = dye.getTextureDiffuseColor();
+            int dr = blendR - ((dRgb >> 16) & 0xFF);
+            int dg = blendG - ((dRgb >>  8) & 0xFF);
+            int db = blendB - (dRgb & 0xFF);
+            int dist = dr*dr + dg*dg + db*db;
+            if (dist < minDist) { minDist = dist; nearest = dye; }
+        }
+        return (byte) nearest.getId();
+    }
+
+    public int hitToPixel(Direction facing, Vec3 hitPos, BlockPos blockPos) {
         double lx = hitPos.x - blockPos.getX();
         double ly = hitPos.y - blockPos.getY();
         double lz = hitPos.z - blockPos.getZ();

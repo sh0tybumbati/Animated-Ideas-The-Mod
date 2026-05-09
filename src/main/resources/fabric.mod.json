@@ -25,7 +25,8 @@
     ]
   },
   "mixins": [
-    "garrettmod.mixins.json"
+    "garrettmod.mixins.json",
+    "garrettmod.client.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.15.11",

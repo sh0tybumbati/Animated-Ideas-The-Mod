@@ -3,7 +3,10 @@ package com.garrett.mod;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -11,9 +14,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -187,6 +193,40 @@ public class GarrettMod implements ModInitializer {
 				}
 			}
 			return InteractionResult.PASS;
+		});
+
+		// Canvas: left-click with brush + offhand dye = replace pixel
+		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+			if (!CONFIG.enableCanvases) return InteractionResult.PASS;
+			BlockState state = world.getBlockState(pos);
+			if (!(state.getBlock() instanceof CanvasBlock canvas)) return InteractionResult.PASS;
+			if (state.getValue(CanvasBlock.WAXED)) return InteractionResult.PASS;
+			ItemStack mainHand = player.getMainHandItem();
+			if (!mainHand.is(Items.BRUSH)) return InteractionResult.PASS;
+			ItemStack offhand = player.getOffhandItem();
+			if (!(offhand.getItem() instanceof DyeItem dye)) return InteractionResult.PASS;
+
+			HitResult hit = player.pick(5.0, 0, false);
+			if (!(hit instanceof BlockHitResult blockHit) || !blockHit.getBlockPos().equals(pos))
+				return InteractionResult.PASS;
+
+			if (!world.isClientSide() && world.getBlockEntity(pos) instanceof CanvasBlockEntity be) {
+				int pixel = canvas.hitToPixel(state.getValue(CanvasBlock.FACING), blockHit.getLocation(), pos);
+				if (pixel >= 0) be.setPixel(pixel, (byte) dye.getDyeColor().getId());
+			}
+			return InteractionResult.sidedSuccess(world.isClientSide());
+		});
+
+		// Canvas: eyedropper C2S packet — set offhand to sampled dye color
+		PayloadTypeRegistry.playC2S().register(EyedropperPayload.TYPE, EyedropperPayload.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(EyedropperPayload.TYPE, (payload, context) -> {
+			DyeColor color = DyeColor.byId(payload.colorId());
+			if (color == null) return;
+			ItemStack dye = new ItemStack(DyeItem.byColor(color));
+			context.server().execute(() -> {
+				var offhand = context.player().getInventory().offhand;
+				offhand.set(0, dye);
+			});
 		});
 
 		LOGGER.info("GarrettTheCarrotMod initialized!");

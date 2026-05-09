@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "com.garrett.mod.client.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"PickBlockMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
