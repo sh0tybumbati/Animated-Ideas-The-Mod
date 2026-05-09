@@ -134,7 +134,7 @@ public class CanvasBlock extends BaseEntityBlock {
                 if (pixel >= 0) {
                     if (!level.isClientSide()) {
                         int current = canvas.getPixels()[pixel];
-                        canvas.setPixel(pixel, blendColors(current, dye.getDyeColor(), this.color));
+                        canvas.setPixel(pixel, blendColors(current, dye.getDyeColor()));
                     }
                     return ItemInteractionResult.sidedSuccess(level.isClientSide());
                 }
@@ -144,15 +144,13 @@ public class CanvasBlock extends BaseEntityBlock {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    private static int blendColors(int existingRgb, DyeColor newColor, DyeColor bgColor) {
-        int base = (existingRgb == CanvasBlockEntity.UNPAINTED)
-                ? (bgColor != null ? bgColor.getTextureDiffuseColor() & 0xFFFFFF
-                                   : newColor.getTextureDiffuseColor() & 0xFFFFFF)
-                : existingRgb;
+    private static int blendColors(int existingRgb, DyeColor newColor) {
+        if (existingRgb == CanvasBlockEntity.UNPAINTED)
+            return newColor.getTextureDiffuseColor() & 0xFFFFFF;
         int n = newColor.getTextureDiffuseColor() & 0xFFFFFF;
-        int r = (((base >> 16) & 0xFF) + ((n >> 16) & 0xFF)) / 2;
-        int g = (((base >>  8) & 0xFF) + ((n >>  8) & 0xFF)) / 2;
-        int b = ((base & 0xFF) + (n & 0xFF)) / 2;
+        int r = (((existingRgb >> 16) & 0xFF) + ((n >> 16) & 0xFF)) / 2;
+        int g = (((existingRgb >>  8) & 0xFF) + ((n >>  8) & 0xFF)) / 2;
+        int b = ( (existingRgb        & 0xFF) + ( n        & 0xFF)) / 2;
         return (r << 16) | (g << 8) | b;
     }
 
