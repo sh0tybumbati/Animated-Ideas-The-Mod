@@ -6,7 +6,7 @@ A Minecraft Fabric mod (1.21) implementing ideas from [GarrettTheCarrot](https:/
 
 ### Part 1
 - **Sandwiches** — Craft a sandwich from 2 bread + 1 cooked meat. Seven variants (beef, pork, chicken, mutton, rabbit, salmon, cod), each with hunger stats equal to the sum of their ingredients.
-- **Paintable Canvases** — Wall-mounted 16×16 pixel canvases in all 16 dye colors, plus a transparent (glass) variant. Paint with dyes, seal with honeycomb.
+- **Paintable Canvases** — Wall-mounted 16×16 pixel canvases in all 16 dye colors, plus a transparent (glass) variant. Paint with a brush (main hand) and dye (offhand), seal with honeycomb.
 - **Placeable Gunpowder** — Right-click to place gunpowder on the ground as a block. Lights with flint and steel.
 - **Placeable Milk** — Pour a milk bucket into the world like water. Flows and clears effects on contact.
 - **Repairable Anvils** — Right-click a damaged or chipped anvil with an iron ingot to repair it one stage. Right-click with an iron block to fully restore it.

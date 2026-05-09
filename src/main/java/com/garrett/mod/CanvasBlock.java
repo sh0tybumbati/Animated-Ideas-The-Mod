@@ -126,14 +126,17 @@ public class CanvasBlock extends BaseEntityBlock {
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
 
-        // Paint with dye
-        if (!state.getValue(WAXED) && stack.getItem() instanceof DyeItem dye) {
-            int pixel = hitToPixel(state.getValue(FACING), hit.getLocation(), pos);
-            if (pixel >= 0) {
-                if (!level.isClientSide()) {
-                    canvas.setPixel(pixel, (byte) dye.getDyeColor().getId());
+        // Paint with brush (main hand) + dye (offhand)
+        if (!state.getValue(WAXED) && stack.is(Items.BRUSH)) {
+            ItemStack offhand = player.getOffhandItem();
+            if (offhand.getItem() instanceof DyeItem dye) {
+                int pixel = hitToPixel(state.getValue(FACING), hit.getLocation(), pos);
+                if (pixel >= 0) {
+                    if (!level.isClientSide()) {
+                        canvas.setPixel(pixel, (byte) dye.getDyeColor().getId());
+                    }
+                    return ItemInteractionResult.sidedSuccess(level.isClientSide());
                 }
-                return ItemInteractionResult.sidedSuccess(level.isClientSide());
             }
         }
 
