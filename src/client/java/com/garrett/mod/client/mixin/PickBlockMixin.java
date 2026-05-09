@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -36,10 +37,12 @@ public class PickBlockMixin {
         int pixel = canvas.hitToPixel(state.getValue(CanvasBlock.FACING), blockHit.getLocation(), pos);
         if (pixel < 0) return;
 
-        byte colorId = canvasEntity.getPixels()[pixel];
-        if (colorId < 0 || colorId >= 16) return;
+        int rgb = canvasEntity.getPixels()[pixel];
+        if (rgb == CanvasBlockEntity.UNPAINTED) return;
 
-        ClientPlayNetworking.send(new EyedropperPayload(colorId));
+        // Snap to nearest DyeColor only here so the player gets a holdable dye item
+        DyeColor nearest = CanvasBlock.nearestDyeColor(rgb);
+        ClientPlayNetworking.send(new EyedropperPayload(nearest.getId()));
         ci.cancel();
     }
 }

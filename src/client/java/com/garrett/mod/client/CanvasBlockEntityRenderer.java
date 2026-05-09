@@ -23,17 +23,11 @@ import java.util.Map;
 
 public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBlockEntity> {
 
-    // ABGR for NativeImage, indexed by DyeColor.getId()
-    private static final int[] DYE_ABGR = new int[16];
-
-    static {
-        for (DyeColor dye : DyeColor.values()) {
-            int rgb = dye.getTextureDiffuseColor() & 0xFFFFFF;
-            int r = (rgb >> 16) & 0xFF;
-            int g = (rgb >> 8) & 0xFF;
-            int b = rgb & 0xFF;
-            DYE_ABGR[dye.getId()] = (0xFF << 24) | (b << 16) | (g << 8) | r;
-        }
+    private static int rgbToAbgr(int rgb) {
+        int r = (rgb >> 16) & 0xFF;
+        int g = (rgb >>  8) & 0xFF;
+        int b =  rgb        & 0xFF;
+        return (0xFF << 24) | (b << 16) | (g << 8) | r;
     }
 
     private static final Map<BlockPos, DynamicTexture> TEXTURES = new HashMap<>();
@@ -48,9 +42,10 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
         if (!(state.getBlock() instanceof CanvasBlock canvas)) return;
 
         Direction facing = state.getValue(CanvasBlock.FACING);
-        byte[] pixels = entity.getPixels();
+        int[] pixels = entity.getPixels();
         BlockPos pos = entity.getBlockPos().immutable();
-        int bgAbgr = canvas.transparent ? 0x00000000 : DYE_ABGR[canvas.color.getId()];
+        int bgAbgr = canvas.transparent ? 0x00000000
+                : rgbToAbgr(canvas.color.getTextureDiffuseColor() & 0xFFFFFF);
 
         // Get or create a DynamicTexture for this canvas position
         DynamicTexture tex = TEXTURES.computeIfAbsent(pos, p -> new DynamicTexture(16, 16, false));
@@ -65,9 +60,8 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
         if (img != null) {
             for (int py = 0; py < 16; py++) {
                 for (int px = 0; px < 16; px++) {
-                    byte id = pixels[py * 16 + px];
-                    // id == -1 means unpainted: use background (transparent for cobweb canvas)
-                    int abgr = (id >= 0 && id < 16) ? DYE_ABGR[id] : bgAbgr;
+                    int rgb = pixels[py * 16 + px];
+                    int abgr = (rgb == CanvasBlockEntity.UNPAINTED) ? bgAbgr : rgbToAbgr(rgb);
                     img.setPixelRGBA(px, py, abgr);
                 }
             }

@@ -212,7 +212,7 @@ public class GarrettMod implements ModInitializer {
 
 			if (!world.isClientSide() && world.getBlockEntity(pos) instanceof CanvasBlockEntity be) {
 				int pixel = canvas.hitToPixel(state.getValue(CanvasBlock.FACING), blockHit.getLocation(), pos);
-				if (pixel >= 0) be.setPixel(pixel, (byte) dye.getDyeColor().getId());
+				if (pixel >= 0) be.setPixel(pixel, dye.getDyeColor().getTextureDiffuseColor() & 0xFFFFFF);
 			}
 			return InteractionResult.sidedSuccess(world.isClientSide());
 		});

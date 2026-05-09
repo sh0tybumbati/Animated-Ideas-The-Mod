@@ -3,7 +3,7 @@ package com.garrett.mod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ByteArrayTag;
+import net.minecraft.nbt.IntArrayTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -14,18 +14,21 @@ import java.util.Arrays;
 
 public class CanvasBlockEntity extends BlockEntity {
 
-    private final byte[] pixels = new byte[256];
+    public static final int UNPAINTED = -1;
+
+    // Each int is 0x00RRGGBB, or UNPAINTED (-1) for an empty pixel.
+    private final int[] pixels = new int[256];
 
     public CanvasBlockEntity(BlockPos pos, BlockState state) {
         super(GarrettMod.CANVAS_BLOCK_ENTITY_TYPE, pos, state);
-        Arrays.fill(pixels, (byte) -1); // -1 = transparent (show background color)
+        Arrays.fill(pixels, UNPAINTED);
     }
 
-    public byte[] getPixels() { return pixels; }
+    public int[] getPixels() { return pixels; }
 
-    public void setPixel(int index, byte colorId) {
+    public void setPixel(int index, int rgb) {
         if (index < 0 || index >= 256) return;
-        pixels[index] = colorId;
+        pixels[index] = rgb;
         setChanged();
         if (level != null && !level.isClientSide()) {
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
@@ -35,14 +38,14 @@ public class CanvasBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
-        tag.put("pixels", new ByteArrayTag(pixels));
+        tag.put("pixels", new IntArrayTag(pixels));
     }
 
     @Override
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("pixels")) {
-            byte[] loaded = tag.getByteArray("pixels");
+            int[] loaded = tag.getIntArray("pixels");
             int len = Math.min(loaded.length, 256);
             System.arraycopy(loaded, 0, pixels, 0, len);
         }
