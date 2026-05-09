@@ -1,5 +1,6 @@
 package com.garrett.mod;
 
+import com.garrett.mod.mixin.PlayerShoulderAccessor;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
@@ -243,18 +244,20 @@ public class GarrettMod implements ModInitializer {
 
 			var tag = (onLeft ? left : right).copy();
 			ServerLevel level = (ServerLevel) world;
-			EntityType.loadEntityRecursive(tag, level, level.registryAccess(), e -> {
+			Entity spawned = EntityType.loadEntityRecursive(tag, level, e -> {
 				e.setPos(stand.getX(), stand.getY() + 1.2, stand.getZ());
 				if (e instanceof Parrot parrot) {
 					parrot.setOrderedToSit(true);
 					parrot.setInSittingPose(true);
 				}
 				return e;
-			}).ifPresent(e -> {
-				level.addFreshEntity(e);
-				if (onLeft) serverPlayer.setShoulderEntityLeft(new CompoundTag());
-				else        serverPlayer.setShoulderEntityRight(new CompoundTag());
 			});
+			if (spawned != null) {
+				level.addFreshEntity(spawned);
+				PlayerShoulderAccessor accessor = (PlayerShoulderAccessor) serverPlayer;
+				if (onLeft) accessor.gtcai$setShoulderEntityLeft(new CompoundTag());
+				else        accessor.gtcai$setShoulderEntityRight(new CompoundTag());
+			}
 			return InteractionResult.sidedSuccess(world.isClientSide());
 		});
 

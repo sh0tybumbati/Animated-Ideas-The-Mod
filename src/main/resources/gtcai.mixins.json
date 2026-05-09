@@ -5,6 +5,7 @@
 	"mixins": [
 		"FurnaceGunpowderMixin",
 		"ServerPlayerGameModeAccessor",
+		"PlayerShoulderAccessor",
 		"CoopMiningMixin",
 		"BlockStateCoopMixin",
 		"LogicalCraftingMixin"
