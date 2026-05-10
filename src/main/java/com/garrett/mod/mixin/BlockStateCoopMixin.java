@@ -20,7 +20,7 @@ public class BlockStateCoopMixin {
     // Guard against re-entrant calls when we call getDestroyProgress on co-miners
     private static final ThreadLocal<Boolean> BOOSTING = ThreadLocal.withInitial(() -> false);
 
-    @Inject(method = "getDestroyProgress", at = @At("RETURN"), cancellable = true)
+    @Inject(method = "getDestroyProgress", at = @At("RETURN"), cancellable = true, require = 0)
     private void coopBoost(Player player, BlockGetter level, BlockPos pos,
                            CallbackInfoReturnable<Float> cir) {
         if (BOOSTING.get() || !GarrettMod.CONFIG.enableCoopMining) return;
