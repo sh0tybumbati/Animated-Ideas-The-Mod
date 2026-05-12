@@ -8,7 +8,9 @@
 		"PlayerShoulderAccessor",
 		"CoopMiningMixin",
 		"BlockStateCoopMixin",
-		"LogicalCraftingMixin"
+		"LogicalCraftingMixin",
+		"StonecutterDamageMixin",
+		"TridentHitboxMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

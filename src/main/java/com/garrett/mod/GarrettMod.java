@@ -99,10 +99,30 @@ public class GarrettMod implements ModInitializer {
 		);
 	}
 
+	public static final Block PUMPKIN_PIE_BLOCK = new PumpkinPieBlock(
+		BlockBehaviour.Properties.of().strength(0.5f).noOcclusion()
+	);
+
+	public static final Item MILK_SPLASH_POTION = new MilkSplashPotionItem(
+		new Item.Properties().stacksTo(1)
+	);
+
+	public static EntityType<ThrownMilkPotion> THROWN_MILK_POTION_ENTITY_TYPE;
+
 	@Override
 	public void onInitialize() {
 		AutoConfig.register(GarrettModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(GarrettModConfig.class).getConfig();
+
+		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "pumpkin_pie_block"), PUMPKIN_PIE_BLOCK);
+		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_splash_potion"), MILK_SPLASH_POTION);
+		
+		THROWN_MILK_POTION_ENTITY_TYPE = Registry.register(
+			BuiltInRegistries.ENTITY_TYPE,
+			ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_splash_potion"),
+			EntityType.Builder.<ThrownMilkPotion>of(ThrownMilkPotion::new, net.minecraft.world.entity.MobCategory.MISC)
+				.sized(0.25F, 0.25F).build("milk_splash_potion")
+		);
 
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "gunpowder_block"), GUNPOWDER_BLOCK);
 		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk"), MILK_FLUID_STILL);
@@ -198,6 +218,24 @@ public class GarrettMod implements ModInitializer {
 						world.setBlock(hitResult.getBlockPos(), repairTarget.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing), 3);
 						if (!player.isCreative()) stack.shrink(1);
 						world.levelEvent(1031, hitResult.getBlockPos(), 0);
+					}
+					return InteractionResult.sidedSuccess(world.isClientSide());
+				}
+			}
+			return InteractionResult.PASS;
+		});
+
+		// Placeable Pumpkin Pie
+		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+			if (!CONFIG.enablePlaceablePumpkinPie) return InteractionResult.PASS;
+
+			ItemStack stack = player.getItemInHand(hand);
+			if (stack.is(Items.PUMPKIN_PIE)) {
+				BlockPos pos = hitResult.getBlockPos().relative(hitResult.getDirection());
+				if (world.getBlockState(pos).canBeReplaced()) {
+					if (!world.isClientSide()) {
+						world.setBlock(pos, PUMPKIN_PIE_BLOCK.defaultBlockState(), 3);
+						if (!player.isCreative()) stack.shrink(1);
 					}
 					return InteractionResult.sidedSuccess(world.isClientSide());
 				}

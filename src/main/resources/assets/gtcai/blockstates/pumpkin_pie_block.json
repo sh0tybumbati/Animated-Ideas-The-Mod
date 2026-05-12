@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "bites=0": { "model": "gtcai:block/pumpkin_pie_0" },
+    "bites=1": { "model": "gtcai:block/pumpkin_pie_1" },
+    "bites=2": { "model": "gtcai:block/pumpkin_pie_2" },
+    "bites=3": { "model": "gtcai:block/pumpkin_pie_3" }
+  }
+}

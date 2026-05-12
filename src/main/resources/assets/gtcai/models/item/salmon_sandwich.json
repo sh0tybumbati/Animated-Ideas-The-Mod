@@ -1,6 +1,1 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "gtcai:item/sandwich"
-  }
-}
+{"parent": "minecraft:item/generated", "textures": {"layer0": "gtcai:item/salmon_sandwich"}}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:milk_bucket" },
+    { "item": "minecraft:gunpowder" }
+  ],
+  "result": {
+    "count": 1,
+    "id": "gtcai:milk_splash_potion"
+  }
+}

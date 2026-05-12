@@ -35,4 +35,16 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableLogicalTrapdoors = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableDangerousStonecutters = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enablePlaceablePumpkinPie = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableMilkSplashPotion = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableTridentHitboxes = true;
 }

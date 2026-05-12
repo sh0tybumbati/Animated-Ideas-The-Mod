@@ -1,21 +1,23 @@
 {
-  "parent": "minecraft:block/block",
-  "elements": [
-    {
-      "from": [0, 0, 14],
-      "to": [16, 16, 16],
-      "faces": {
-        "south": { "texture": "#back", "cullface": "south" },
-        "east":  { "texture": "#side", "cullface": "east" },
-        "west":  { "texture": "#side", "cullface": "west" },
-        "up":    { "texture": "#side", "cullface": "up" },
-        "down":  { "texture": "#side", "cullface": "down" }
-      }
-    }
-  ],
-  "textures": {
-    "back":     "minecraft:block/glass",
-    "side":     "minecraft:block/glass",
-    "particle": "minecraft:block/glass"
-  }
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
+	"textures": {
+		"particle": "block/glass",
+		"side": "block/glass"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 14],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 0, 0], "texture": "#side", "cullface": "north", "tintindex": 0},
+				"east": {"uv": [0, 0, 2, 16], "texture": "#side", "cullface": "east", "tintindex": 0},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#side", "cullface": "south", "tintindex": 0},
+				"west": {"uv": [14, 0, 16, 16], "texture": "#side", "cullface": "west", "tintindex": 0},
+				"up": {"uv": [0, 14, 16, 16], "texture": "#side", "cullface": "up", "tintindex": 0},
+				"down": {"uv": [0, 0, 16, 2], "texture": "#side", "cullface": "down", "tintindex": 0}
+			}
+		}
+	]
 }
