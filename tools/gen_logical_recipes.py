@@ -26,7 +26,7 @@ OUT = os.path.join(ROOT, "src/main/resources/data/minecraft/recipe")
 
 STAIR_PATTERN_6 = ["#  ", "## ", "###"]
 STAIR_PATTERN_3 = ["#  ", "## "]
-TRAPDOOR_YIELD = 16
+TRAPDOOR_YIELD = 24
 
 
 def single_ingredient_item(recipe):
