@@ -13,9 +13,6 @@ public class GarrettModConfig implements ConfigData {
     public boolean enableGunpowderExplosions = true;
 
     @ConfigEntry.Gui.Tooltip
-    public boolean enableLogicalStairs = true;
-
-    @ConfigEntry.Gui.Tooltip
     public boolean enablePlaceableGunpowder = true;
 
     @ConfigEntry.Gui.Tooltip
@@ -34,9 +31,6 @@ public class GarrettModConfig implements ConfigData {
     public boolean enableCanvases = true;
 
     @ConfigEntry.Gui.Tooltip
-    public boolean enableLogicalTrapdoors = true;
-
-    @ConfigEntry.Gui.Tooltip
     public boolean enableDangerousStonecutters = true;
 
     @ConfigEntry.Gui.Tooltip
@@ -47,4 +41,7 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableTridentHitboxes = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableAirFryer = true;
 }

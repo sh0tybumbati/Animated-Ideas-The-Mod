@@ -7,12 +7,18 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,7 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
@@ -43,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -57,24 +62,13 @@ public class GarrettMod implements ModInitializer {
 		BlockBehaviour.Properties.of().noOcclusion().instabreak()
 	);
 
-	// bread(5,0.6) + bread(5,0.6) + meat → summed nutrition, weighted saturation
-	public static final Map<String, Item> SANDWICHES = new LinkedHashMap<>();
-	static {
-		record Meat(String name, int nutrition, float sat) {}
-		Meat[] meats = {
-			new Meat("beef",    18, 0.7f),
-			new Meat("pork",    18, 0.7f),
-			new Meat("chicken", 16, 0.6f),
-			new Meat("mutton",  16, 0.6f),
-			new Meat("rabbit",  15, 0.6f),
-			new Meat("salmon",  16, 0.7f),
-			new Meat("cod",     15, 0.6f),
-		};
-		for (Meat m : meats) {
-			SANDWICHES.put(m.name() + "_sandwich", new Item(new Item.Properties()
-				.food(new FoodProperties.Builder().nutrition(m.nutrition()).saturationModifier(m.sat()).build())));
-		}
-	}
+	public static final Block AIR_FRYER_BLOCK = new AirFryerBlock(
+		BlockBehaviour.Properties.of().strength(3.5f).requiresCorrectToolForDrops()
+			.lightLevel(s -> s.getValue(BlockStateProperties.LIT) ? 13 : 0)
+	);
+	public static BlockEntityType<AirFryerBlockEntity> AIR_FRYER_BLOCK_ENTITY;
+
+	// Sandwiches (every edible vanilla food) are defined in Sandwiches.
 
 	public static final FlowingFluid MILK_FLUID_STILL = new MilkFluid.Source();
 	public static final FlowingFluid MILK_FLUID_FLOWING = new MilkFluid.Flowing();
@@ -109,27 +103,42 @@ public class GarrettMod implements ModInitializer {
 
 	public static EntityType<ThrownMilkPotion> THROWN_MILK_POTION_ENTITY_TYPE;
 
+	public static final ResourceKey<CreativeModeTab> ITEM_GROUP_KEY =
+		ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "general"));
+
 	@Override
 	public void onInitialize() {
 		AutoConfig.register(GarrettModConfig.class, GsonConfigSerializer::new);
 		CONFIG = AutoConfig.getConfigHolder(GarrettModConfig.class).getConfig();
 
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "pumpkin_pie_block"), PUMPKIN_PIE_BLOCK);
-		Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_splash_potion"), MILK_SPLASH_POTION);
-		
-		THROWN_MILK_POTION_ENTITY_TYPE = Registry.register(
-			BuiltInRegistries.ENTITY_TYPE,
-			ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_splash_potion"),
-			EntityType.Builder.<ThrownMilkPotion>of(ThrownMilkPotion::new, net.minecraft.world.entity.MobCategory.MISC)
-				.sized(0.25F, 0.25F).build("milk_splash_potion")
-		);
+
+		if (CONFIG.enableMilkSplashPotion) {
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_splash_potion"), MILK_SPLASH_POTION);
+
+			THROWN_MILK_POTION_ENTITY_TYPE = Registry.register(
+				BuiltInRegistries.ENTITY_TYPE,
+				ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_splash_potion"),
+				EntityType.Builder.<ThrownMilkPotion>of(ThrownMilkPotion::new, net.minecraft.world.entity.MobCategory.MISC)
+					.sized(0.25F, 0.25F).build("milk_splash_potion")
+			);
+		}
 
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "gunpowder_block"), GUNPOWDER_BLOCK);
 		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk"), MILK_FLUID_STILL);
 		Registry.register(BuiltInRegistries.FLUID, ResourceLocation.fromNamespaceAndPath(MOD_ID, "flowing_milk"), MILK_FLUID_FLOWING);
 		Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_block"), MILK_BLOCK);
-		for (Map.Entry<String, Item> e : SANDWICHES.entrySet()) {
-			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, e.getKey()), e.getValue());
+		if (CONFIG.enableSandwiches) {
+			Sandwiches.registerAll();
+		}
+
+		if (CONFIG.enableAirFryer) {
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "air_fryer"), AIR_FRYER_BLOCK);
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "air_fryer"),
+				new BlockItem(AIR_FRYER_BLOCK, new Item.Properties()));
+			AIR_FRYER_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
+				ResourceLocation.fromNamespaceAndPath(MOD_ID, "air_fryer"),
+				BlockEntityType.Builder.of(AirFryerBlockEntity::new, AIR_FRYER_BLOCK).build(null));
 		}
 
 		// Register all 16 colored canvas blocks and items
@@ -309,6 +318,26 @@ public class GarrettMod implements ModInitializer {
 				var offhand = context.player().getInventory().offhand;
 				offhand.set(0, dye);
 			});
+		});
+
+		// Creative mode tab — only adds items that are actually registered, so it
+		// stays consistent with the enableSandwiches / enableMilkSplashPotion flags.
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP_KEY,
+			FabricItemGroup.builder()
+				.icon(() -> new ItemStack(CONFIG.enableMilkSplashPotion
+					? MILK_SPLASH_POTION
+					: CANVAS_BLOCKS.get(DyeColor.WHITE).asItem()))
+				.title(Component.translatable("itemGroup.gtcai.general"))
+				.build());
+
+		ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP_KEY).register(entries -> {
+			if (CONFIG.enableAirFryer) entries.accept(AIR_FRYER_BLOCK);
+			if (CONFIG.enableSandwiches) {
+				for (Item sandwich : Sandwiches.ITEMS.values()) entries.accept(sandwich);
+			}
+			for (DyeColor color : DyeColor.values()) entries.accept(CANVAS_BLOCKS.get(color));
+			entries.accept(TRANSPARENT_CANVAS);
+			if (CONFIG.enableMilkSplashPotion) entries.accept(MILK_SPLASH_POTION);
 		});
 
 		LOGGER.info("GarrettTheCarrotMod initialized!");

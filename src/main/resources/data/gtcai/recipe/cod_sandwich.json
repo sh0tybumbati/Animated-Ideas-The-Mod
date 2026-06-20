@@ -1,9 +1,27 @@
 {
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:registry_contains",
+      "registry": "minecraft:item",
+      "values": [
+        "gtcai:cod_sandwich"
+      ]
+    }
+  ],
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    { "item": "minecraft:bread" },
-    { "item": "minecraft:bread" },
-    { "item": "minecraft:cooked_cod" }
+    {
+      "item": "minecraft:bread"
+    },
+    {
+      "item": "minecraft:bread"
+    },
+    {
+      "item": "minecraft:cooked_cod"
+    }
   ],
-  "result": { "id": "gtcai:cod_sandwich", "count": 1 }
+  "result": {
+    "id": "gtcai:cod_sandwich",
+    "count": 1
+  }
 }

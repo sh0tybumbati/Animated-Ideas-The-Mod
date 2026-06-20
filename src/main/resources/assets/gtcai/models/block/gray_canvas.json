@@ -1,24 +1,22 @@
 {
-	"format_version": "1.21.11",
-	"credit": "Made with Blockbench",
-	"parent": "minecraft:block/block",
-	"textures": {
-		"particle": "gtcai:block/canvas_back",
-		"back": "gtcai:block/canvas_back",
-		"side": "gtcai:block/canvas_side"
-	},
-	"elements": [
-		{
-			"from": [0, 0, 14],
-			"to": [16, 16, 16],
-			"faces": {
-				"north": {"uv": [0, 0, 0, 0], "texture": "#side", "cullface": "north"},
-				"east": {"uv": [0, 0, 2, 16], "texture": "#side", "cullface": "east"},
-				"south": {"uv": [0, 0, 16, 16], "texture": "#back", "cullface": "south", "tintindex": 0},
-				"west": {"uv": [14, 0, 16, 16], "texture": "#back", "cullface": "west", "tintindex": 0},
-				"up": {"uv": [0, 14, 16, 16], "texture": "#back", "cullface": "up", "tintindex": 0},
-				"down": {"uv": [0, 0, 16, 2], "texture": "#back", "cullface": "down", "tintindex": 0}
-			}
-		}
-	]
+  "__comment": "north (front) face is rendered by CanvasBlockEntityRenderer at z=14; omitting it here avoids z-fighting. Edges use the white canvas texture tinted by the block color provider (dyed canvas wrap); the back is wood.",
+  "parent": "minecraft:block/block",
+  "textures": {
+    "canvas": "gtcai:block/canvas_front",
+    "wood": "gtcai:block/canvas_side",
+    "particle": "gtcai:block/canvas_side"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 14],
+      "to": [16, 16, 16],
+      "faces": {
+        "south": { "texture": "#wood", "cullface": "south" },
+        "east":  { "texture": "#canvas", "cullface": "east",  "tintindex": 0 },
+        "west":  { "texture": "#canvas", "cullface": "west",  "tintindex": 0 },
+        "up":    { "texture": "#canvas", "cullface": "up",    "tintindex": 0 },
+        "down":  { "texture": "#canvas", "cullface": "down",  "tintindex": 0 }
+      }
+    }
+  ]
 }

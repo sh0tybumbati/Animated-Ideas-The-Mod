@@ -8,9 +8,10 @@
 		"PlayerShoulderAccessor",
 		"CoopMiningMixin",
 		"BlockStateCoopMixin",
-		"LogicalCraftingMixin",
 		"StonecutterDamageMixin",
-		"TridentHitboxMixin"
+		"TridentHitboxMixin",
+		"AbstractArrowAccessor",
+		"AirFryerCookSpeedMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

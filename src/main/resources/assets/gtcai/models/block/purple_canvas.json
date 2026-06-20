@@ -1,21 +1,22 @@
 {
+  "__comment": "north (front) face is rendered by CanvasBlockEntityRenderer at z=14; omitting it here avoids z-fighting. Edges use the white canvas texture tinted by the block color provider (dyed canvas wrap); the back is wood.",
   "parent": "minecraft:block/block",
+  "textures": {
+    "canvas": "gtcai:block/canvas_front",
+    "wood": "gtcai:block/canvas_side",
+    "particle": "gtcai:block/canvas_side"
+  },
   "elements": [
     {
       "from": [0, 0, 14],
       "to": [16, 16, 16],
       "faces": {
-        "south": { "texture": "#back", "cullface": "south" },
-        "east":  { "texture": "#side", "cullface": "east",  "tintindex": 0 },
-        "west":  { "texture": "#side", "cullface": "west",  "tintindex": 0 },
-        "up":    { "texture": "#side", "cullface": "up",    "tintindex": 0 },
-        "down":  { "texture": "#side", "cullface": "down",  "tintindex": 0 }
+        "south": { "texture": "#wood", "cullface": "south" },
+        "east":  { "texture": "#canvas", "cullface": "east",  "tintindex": 0 },
+        "west":  { "texture": "#canvas", "cullface": "west",  "tintindex": 0 },
+        "up":    { "texture": "#canvas", "cullface": "up",    "tintindex": 0 },
+        "down":  { "texture": "#canvas", "cullface": "down",  "tintindex": 0 }
       }
     }
-  ],
-  "textures": {
-    "back":     "gtcai:block/canvas_back",
-    "side":     "gtcai:block/canvas_side",
-    "particle": "gtcai:block/canvas_back"
-  }
+  ]
 }

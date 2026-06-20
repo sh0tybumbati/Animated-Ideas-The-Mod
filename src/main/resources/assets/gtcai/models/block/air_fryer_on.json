@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "gtcai:block/air_fryer_top",
+    "bottom": "gtcai:block/air_fryer_bottom",
+    "side": "gtcai:block/air_fryer_side",
+    "front": "gtcai:block/air_fryer_front_on"
+  }
+}

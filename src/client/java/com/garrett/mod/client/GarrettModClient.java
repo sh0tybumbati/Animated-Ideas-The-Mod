@@ -8,8 +8,10 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
 
@@ -27,7 +29,7 @@ public class GarrettModClient implements ClientModInitializer {
 		FluidRenderHandlerRegistry.INSTANCE.register(GarrettMod.MILK_FLUID_FLOWING, milkRenderHandler);
 
 		ColorProviderRegistry.BLOCK.register(
-			(state, world, pos, tintIndex) -> state.getValue(GunpowderBlock.LIT) ? 0xFFAA00 : 0x777777,
+			(state, world, pos, tintIndex) -> state.getValue(GunpowderBlock.LIT) ? 0xFFAA00 : 0x4A4A4A,
 			GarrettMod.GUNPOWDER_BLOCK
 		);
 
@@ -44,5 +46,12 @@ public class GarrettModClient implements ClientModInitializer {
 		}, GarrettMod.CANVAS_BLOCKS.values().toArray(new CanvasBlock[0]));
 
 		BlockEntityRenderers.register(GarrettMod.CANVAS_BLOCK_ENTITY_TYPE, CanvasBlockEntityRenderer::new);
+
+		// Thrown milk potion renders as its item; without this the entity has no
+		// renderer and crashes the client when thrown. Only registered when the
+		// entity type exists (it is gated by enableMilkSplashPotion).
+		if (GarrettMod.THROWN_MILK_POTION_ENTITY_TYPE != null) {
+			EntityRendererRegistry.register(GarrettMod.THROWN_MILK_POTION_ENTITY_TYPE, ThrownItemRenderer::new);
+		}
 	}
 }
