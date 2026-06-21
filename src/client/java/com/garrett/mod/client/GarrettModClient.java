@@ -53,5 +53,9 @@ public class GarrettModClient implements ClientModInitializer {
 		if (GarrettMod.THROWN_MILK_POTION_ENTITY_TYPE != null) {
 			EntityRendererRegistry.register(GarrettMod.THROWN_MILK_POTION_ENTITY_TYPE, ThrownItemRenderer::new);
 		}
+
+		if (GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY != null) {
+			BlockEntityRenderers.register(GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY, CarvablePumpkinBlockEntityRenderer::new);
+		}
 	}
 }

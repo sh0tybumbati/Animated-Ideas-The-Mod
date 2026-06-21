@@ -12,10 +12,13 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -34,6 +37,7 @@ import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.block.Block;
@@ -67,6 +71,13 @@ public class GarrettMod implements ModInitializer {
 			.lightLevel(s -> s.getValue(BlockStateProperties.LIT) ? 13 : 0)
 	);
 	public static BlockEntityType<AirFryerBlockEntity> AIR_FRYER_BLOCK_ENTITY;
+
+	public static final Block CARVABLE_PUMPKIN_BLOCK = new CarvablePumpkinBlock(
+		BlockBehaviour.Properties.ofFullCopy(Blocks.PUMPKIN)
+			.lightLevel(s -> s.getValue(BlockStateProperties.LIT) ? 15 : 0)
+			.noLootTable() // breaking drops a carving-preserving item via playerWillDestroy
+	);
+	public static BlockEntityType<CarvablePumpkinBlockEntity> CARVABLE_PUMPKIN_BLOCK_ENTITY;
 
 	// Sandwiches (every edible vanilla food) are defined in Sandwiches.
 
@@ -139,6 +150,15 @@ public class GarrettMod implements ModInitializer {
 			AIR_FRYER_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
 				ResourceLocation.fromNamespaceAndPath(MOD_ID, "air_fryer"),
 				BlockEntityType.Builder.of(AirFryerBlockEntity::new, AIR_FRYER_BLOCK).build(null));
+		}
+
+		if (CONFIG.enableCustomPumpkinCarving) {
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "carvable_pumpkin"), CARVABLE_PUMPKIN_BLOCK);
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "carvable_pumpkin"),
+				new BlockItem(CARVABLE_PUMPKIN_BLOCK, new Item.Properties()));
+			CARVABLE_PUMPKIN_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
+				ResourceLocation.fromNamespaceAndPath(MOD_ID, "carvable_pumpkin"),
+				BlockEntityType.Builder.of(CarvablePumpkinBlockEntity::new, CARVABLE_PUMPKIN_BLOCK).build(null));
 		}
 
 		// Register all 16 colored canvas blocks and items
@@ -338,6 +358,34 @@ public class GarrettMod implements ModInitializer {
 			for (DyeColor color : DyeColor.values()) entries.accept(CANVAS_BLOCKS.get(color));
 			entries.accept(TRANSPARENT_CANVAS);
 			if (CONFIG.enableMilkSplashPotion) entries.accept(MILK_SPLASH_POTION);
+		});
+
+		// Custom Pumpkin Carving — left-click a pumpkin with a sword to carve a pixel.
+		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+			if (!CONFIG.enableCustomPumpkinCarving) return InteractionResult.PASS;
+			if (!(player.getMainHandItem().getItem() instanceof SwordItem)) return InteractionResult.PASS;
+			if (!direction.getAxis().isHorizontal()) return InteractionResult.PASS;
+
+			BlockState state = world.getBlockState(pos);
+			boolean vanilla = state.is(Blocks.PUMPKIN);
+			boolean carvable = state.is(CARVABLE_PUMPKIN_BLOCK);
+			if (!vanilla && !carvable) return InteractionResult.PASS;
+
+			HitResult hr = player.pick(5.0, 0, false);
+			if (!(hr instanceof BlockHitResult bhr) || !bhr.getBlockPos().equals(pos)) return InteractionResult.PASS;
+
+			if (world.isClientSide()) return InteractionResult.SUCCESS;
+
+			if (vanilla) {
+				world.setBlock(pos, CARVABLE_PUMPKIN_BLOCK.defaultBlockState(), 3);
+				Block.popResource(world, pos, new ItemStack(Items.PUMPKIN_SEEDS, 4));
+			}
+			if (world.getBlockEntity(pos) instanceof CarvablePumpkinBlockEntity be) {
+				int pixel = CarvablePumpkinBlock.hitToPixel(direction, bhr.getLocation(), pos);
+				if (pixel >= 0) be.carve(direction, pixel);
+				world.playSound(null, pos, SoundEvents.PUMPKIN_CARVE, SoundSource.BLOCKS, 1.0f, 1.0f);
+			}
+			return InteractionResult.SUCCESS;
 		});
 
 		LOGGER.info("GarrettTheCarrotMod initialized!");

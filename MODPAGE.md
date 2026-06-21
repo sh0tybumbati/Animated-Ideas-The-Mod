@@ -30,16 +30,16 @@ Parts 3 and beyond are on the roadmap.
 - Co-op Mining - blocks break faster when multiple players mine them together.
 - Air Fryer - twice as fast as a smoker but also twice as HUNGRY
 - Placeable..Milk - bucket of milk, but works the way water does (not infinite).
-- SANDWICH!!! - 2 bread + anything. it will add two breads worth of hunger honches to the thing. I got real dumb with this one.
+- SANDWICH!!! - 2 bread + anything. it will add two breads worth of hunger honches to the thing. I got real dumb with this one. (art to be improved over time)
 
 
 ### Part 2 (In Progress)
 - Placeable Pumpkin Pie - set pumpkin pie down like a cake and eat it slice by slice
 - Splash Potion of Milk - a throwable potion that clears status effects in an area of effect.
-- Doodle Books (in progress) - a freehand drawing interface inside a book.
+- Doodle Books (in progress) - MS Paint style drawing interface inside a book.
 - ~~_**Jungle Villages**_~~ (sorry this is also way too huge a feature T>T)
 - Dangerous Stonecutters - stonecutters now hurt entities that stand on them.
-- Physical Trident Hitboxes - tridents stuck in the ground become solid enough to stand on.
+- Physical Trident Hitboxes (might be tweaked later)  - tridents stuck in the ground become solid enough to stand on.
 
 
 ---
@@ -81,7 +81,15 @@ Parts 3 and beyond are on the roadmap.
 - Dancing Zombified Piglins
 - Emerald Armor & Tools
 
-### Worst Ideas (Parts 6, 7 & 11)
+### Part 13
+- Becon + Sulpher cube w/ Amathist Block = Discoball
+- Feather Falling stops crop trampling
+- MILK ARMOR
+- Custom Pumpkin Carving
+- Armor visibly looks battered with durability
+- FASTER MINECARTS
+
+### Worst Ideas (Parts 6, 7, 11, 12)
 - Talking Signs
 - IKEA Villages
 - Winged Spiders
@@ -93,7 +101,14 @@ Parts 3 and beyond are on the roadmap.
 - Boomerang Arrows
 - Layered Cakes
 - Hitman Creepers
-- ...and more
+- Bee pollen alergies
+- Phantoms DROP CREEPERS
+- Creepers sneeze like a nuke
+- Enderman fails to pick up bedrock
+- Foxy Jumpscare
+- Rain makes grass splippery
+- BIG spiders
+- Milk LINGERING POTION
 
 ### Seasonal & Themed
 - Christmas Specials (Part 4) - snowman hats and noses, Santa Villagers, Hot Chocolate, ornamental spruce trees.

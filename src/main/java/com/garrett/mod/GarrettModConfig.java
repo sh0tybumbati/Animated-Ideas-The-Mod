@@ -44,4 +44,7 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableAirFryer = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableCustomPumpkinCarving = true;
 }

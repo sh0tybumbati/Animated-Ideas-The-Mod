@@ -85,5 +85,8 @@
   "block.gtcai.air_fryer": "Air Fryer",
   "container.gtcai.air_fryer": "Air Fryer",
   "text.autoconfig.gtcai.option.enableAirFryer": "Air Fryer",
-  "text.autoconfig.gtcai.option.enableAirFryer.@Tooltip": "A food-only cooker that is faster than a smoker but burns fuel twice as fast."
+  "text.autoconfig.gtcai.option.enableAirFryer.@Tooltip": "A food-only cooker that is faster than a smoker but burns fuel twice as fast.",
+  "block.gtcai.carvable_pumpkin": "Carvable Pumpkin",
+  "text.autoconfig.gtcai.option.enableCustomPumpkinCarving": "Custom Pumpkin Carving",
+  "text.autoconfig.gtcai.option.enableCustomPumpkinCarving.@Tooltip": "Carve your own face into a pumpkin with a sword, then light it with flint and steel."
 }

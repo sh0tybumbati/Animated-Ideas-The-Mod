@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=false": { "model": "gtcai:block/carvable_pumpkin" },
+    "lit=true":  { "model": "gtcai:block/carvable_pumpkin" }
+  }
+}
