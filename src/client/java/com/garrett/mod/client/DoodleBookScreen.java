@@ -75,7 +75,7 @@ public class DoodleBookScreen extends Screen {
     }
 
     private int toolY() {
-        return eraserY() + PAL_CELL + 6;
+        return canvasY - TOOL_CELL - 6;   // toolbar sits above the canvas (MS-Paint style)
     }
 
     private int displayColor(int v) {
@@ -84,10 +84,11 @@ public class DoodleBookScreen extends Screen {
 
     @Override
     protected void init() {
+        int toolbar = TOOL_CELL + 12;     // room above the canvas for the tool row + title
         int blockW = CANVAS_PX + 14 + PAL_COLS * PAL_CELL;
-        int blockH = CANVAS_PX + 60;
+        int blockH = CANVAS_PX + 60 + toolbar;
         canvasX = (width - blockW) / 2 + 4;
-        canvasY = (height - blockH) / 2 + 16;
+        canvasY = (height - blockH) / 2 + 16 + toolbar;
         palX = canvasX + CANVAS_PX + 6;
         palY = canvasY;
 
@@ -97,8 +98,9 @@ public class DoodleBookScreen extends Screen {
             .pos(canvasX + CANVAS_PX / 2 - 40, by).size(80, 20).build());
         addRenderableWidget(Button.builder(Component.literal(">"), b -> nextPage()).pos(canvasX + CANVAS_PX - 20, by).size(20, 20).build());
 
+        // Clear sits at the right end of the top toolbar.
         addRenderableWidget(Button.builder(Component.literal("Clear"), b -> clearPage())
-            .pos(palX, toolY() + TOOL_CELL + 6).size(Math.max(60, PAL_COLS * PAL_CELL), 16).build());
+            .pos(canvasX + CANVAS_PX - 48, toolY() - 2).size(48, TOOL_CELL + 4).build());
 
         image = new NativeImage(NativeImage.Format.RGBA, GRID, GRID, false);
         texture = new DynamicTexture(image);
@@ -217,7 +219,7 @@ public class DoodleBookScreen extends Screen {
         }
         int ty = toolY();
         for (int t = 0; t < TOOL_ICONS.length; t++) {
-            int sx = palX + t * (TOOL_CELL + 2);
+            int sx = canvasX + t * (TOOL_CELL + 2);
             if (mx >= sx && mx < sx + TOOL_CELL && my >= ty && my < ty + TOOL_CELL) {
                 tool = t;
                 return true;
@@ -302,8 +304,9 @@ public class DoodleBookScreen extends Screen {
         renderBackground(g, mx, my, delta);
         refreshTexture();
 
-        g.fill(canvasX - 4, canvasY - 14, palX + PAL_COLS * PAL_CELL + 2, canvasY + CANVAS_PX + 30, 0xFF_2A1A0A);
-        g.drawCenteredString(font, title, canvasX + CANVAS_PX / 2, canvasY - 12, 0xFFE8C880);
+        int panelTop = toolY() - 14;
+        g.fill(canvasX - 4, panelTop, palX + PAL_COLS * PAL_CELL + 2, canvasY + CANVAS_PX + 30, 0xFF_2A1A0A);
+        g.drawCenteredString(font, title, canvasX + CANVAS_PX / 2, panelTop + 3, 0xFFE8C880);
 
         // 64x64 page scaled up to the canvas area
         g.blit(textureId, canvasX, canvasY, CANVAS_PX, CANVAS_PX, 0f, 0f, GRID, GRID, GRID, GRID);
@@ -332,16 +335,16 @@ public class DoodleBookScreen extends Screen {
         g.drawString(font, "X", palX + 4, ey + 3, 0xFF000000, false);
         if (selectedColor == 0) g.renderOutline(palX - 1, ey - 1, PAL_CELL * 2 + 1, PAL_CELL + 1, 0xFFFFFFFF);
 
-        // Tool buttons
+        // Tool buttons — top toolbar above the canvas
         int ty = toolY();
         for (int t = 0; t < TOOL_ICONS.length; t++) {
-            int sx = palX + t * (TOOL_CELL + 2);
+            int sx = canvasX + t * (TOOL_CELL + 2);
             g.fill(sx, ty, sx + TOOL_CELL, ty + TOOL_CELL, 0xFF_504030);
             g.blit(TOOL_ICONS[t], sx, ty, 0f, 0f, TOOL_CELL, TOOL_CELL, TOOL_CELL, TOOL_CELL);
             if (tool == t) g.renderOutline(sx - 1, ty - 1, TOOL_CELL + 2, TOOL_CELL + 2, 0xFFFFFFFF);
         }
 
-        g.drawString(font, "Page " + (page + 1) + " / " + pages.size(), palX, ty + TOOL_CELL + 28, 0xFFE8C880, false);
+        g.drawString(font, "Page " + (page + 1) + " / " + pages.size(), palX, eraserY() + PAL_CELL + 8, 0xFFE8C880, false);
 
         super.render(g, mx, my, delta);
     }
