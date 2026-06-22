@@ -59,6 +59,11 @@ public class GarrettModClient implements ClientModInitializer {
 			EntityRendererRegistry.register(GarrettMod.THROWN_MILK_POTION_ENTITY_TYPE, ThrownItemRenderer::new);
 		}
 
+		// Milk splash potion uses the vanilla splash-potion model with a white liquid tint.
+		if (GarrettMod.CONFIG.enableMilkSplashPotion) {
+			ColorProviderRegistry.ITEM.register((stack, tintIndex) -> 0xFFFFFFFF, GarrettMod.MILK_SPLASH_POTION);
+		}
+
 		if (GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY != null) {
 			BlockEntityRenderers.register(GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY, CarvablePumpkinBlockEntityRenderer::new);
 		}
