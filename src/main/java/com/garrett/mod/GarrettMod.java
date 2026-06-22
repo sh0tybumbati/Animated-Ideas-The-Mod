@@ -322,6 +322,19 @@ public class GarrettMod implements ModInitializer {
 			if (world.isClientSide()) return InteractionResult.PASS;
 			if (hand != InteractionHand.MAIN_HAND) return InteractionResult.PASS;
 			if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
+
+			// Click a perched parrot to take it back onto your shoulder.
+			if (entity instanceof Parrot perched && perched.getVehicle() instanceof ArmorStand) {
+				CompoundTag back = new CompoundTag();
+				perched.saveWithoutId(back);
+				back.putString("id", "minecraft:parrot");
+				if (serverPlayer.setEntityOnShoulder(back)) {
+					perched.discard();
+					return InteractionResult.sidedSuccess(world.isClientSide());
+				}
+				return InteractionResult.PASS;
+			}
+
 			if (!(entity instanceof ArmorStand stand)) return InteractionResult.PASS;
 
 			// Find a parrot on either shoulder
@@ -333,19 +346,35 @@ public class GarrettMod implements ModInitializer {
 
 			var tag = (onLeft ? left : right).copy();
 			ServerLevel level = (ServerLevel) world;
-			Entity spawned = EntityType.loadEntityRecursive(tag, level, e -> {
-				e.setPos(stand.getX(), stand.getY() + 1.2, stand.getZ());
-				if (e instanceof Parrot parrot) {
-					parrot.setOrderedToSit(true);
-					parrot.setInSittingPose(true);
+
+			// Free the player's shoulder slot first so a swapped-out parrot has room to return.
+			PlayerShoulderAccessor accessor = (PlayerShoulderAccessor) serverPlayer;
+			if (onLeft) accessor.gtcai$setShoulderEntityLeft(new CompoundTag());
+			else        accessor.gtcai$setShoulderEntityRight(new CompoundTag());
+
+			// One parrot per stand: send any existing perched parrot back to the player.
+			for (Entity rider : stand.getPassengers()) {
+				if (rider instanceof Parrot old) {
+					CompoundTag back = new CompoundTag();
+					old.saveWithoutId(back);
+					back.putString("id", "minecraft:parrot");
+					serverPlayer.setEntityOnShoulder(back);
+					old.discard();
 				}
+			}
+
+			Entity spawned = EntityType.loadEntityRecursive(tag, level, e -> {
+				e.moveTo(stand.getX(), stand.getY(), stand.getZ(), stand.getYRot(), 0.0f);
 				return e;
 			});
 			if (spawned != null) {
 				level.addFreshEntity(spawned);
-				PlayerShoulderAccessor accessor = (PlayerShoulderAccessor) serverPlayer;
-				if (onLeft) accessor.gtcai$setShoulderEntityLeft(new CompoundTag());
-				else        accessor.gtcai$setShoulderEntityRight(new CompoundTag());
+				if (spawned instanceof Parrot parrot) {
+					parrot.setOrderedToSit(true);
+					parrot.setInSittingPose(true);
+					// Ride the stand so it perches instead of dropping off (must be added to the level first).
+					parrot.startRiding(stand, true);
+				}
 			}
 			return InteractionResult.sidedSuccess(world.isClientSide());
 		});

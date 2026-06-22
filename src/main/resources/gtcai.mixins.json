@@ -11,7 +11,8 @@
 		"StonecutterDamageMixin",
 		"TridentHitboxMixin",
 		"AbstractArrowAccessor",
-		"AirFryerCookSpeedMixin"
+		"AirFryerCookSpeedMixin",
+		"ArmorStandPerchMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
