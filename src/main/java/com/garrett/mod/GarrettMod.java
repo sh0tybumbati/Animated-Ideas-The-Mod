@@ -1,6 +1,9 @@
 package com.garrett.mod;
 
 import com.garrett.mod.mixin.PlayerShoulderAccessor;
+import com.mojang.serialization.Codec;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
@@ -61,6 +64,10 @@ public class GarrettMod implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	public static GarrettModConfig CONFIG;
 	public static final Map<UUID, BlockPos> playerMiningPos = new HashMap<>();
+
+	// Which shoulder a perched parrot came from, so it perches on the matching side.
+	public static final AttachmentType<Boolean> PARROT_LEFT_SHOULDER = AttachmentRegistry.createPersistent(
+		ResourceLocation.fromNamespaceAndPath(MOD_ID, "parrot_left_shoulder"), Codec.BOOL);
 
 	public static final Block GUNPOWDER_BLOCK = new GunpowderBlock(
 		BlockBehaviour.Properties.of().noOcclusion().instabreak()
@@ -372,6 +379,7 @@ public class GarrettMod implements ModInitializer {
 				if (spawned instanceof Parrot parrot) {
 					parrot.setOrderedToSit(true);
 					parrot.setInSittingPose(true);
+					parrot.setAttached(PARROT_LEFT_SHOULDER, onLeft);
 					// Ride the stand so it perches instead of dropping off (must be added to the level first).
 					parrot.startRiding(stand, true);
 				}

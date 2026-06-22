@@ -1,5 +1,6 @@
 package com.garrett.mod.mixin;
 
+import com.garrett.mod.GarrettMod;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -21,10 +22,11 @@ public abstract class ArmorStandPerchMixin extends LivingEntity {
     @Override
     protected Vec3 getPassengerAttachmentPoint(Entity entity, EntityDimensions dimensions, float scale) {
         Vec3 base = super.getPassengerAttachmentPoint(entity, dimensions, scale);
-        if (entity instanceof Parrot) {
-            // Offset to a shoulder: rotate the sideways offset by the stand's yaw so it tracks its
-            // facing (instead of floating world-east), then drop to shoulder height.
-            Vec3 side = new Vec3(0.32, 0.0, 0.0).yRot(-(float) Math.toRadians(this.getYRot()));
+        if (entity instanceof Parrot parrot) {
+            // Perch on the same side the parrot was on the player; rotate the sideways offset by the
+            // stand's yaw so it tracks facing, then drop to shoulder height.
+            boolean left = parrot.getAttachedOrElse(GarrettMod.PARROT_LEFT_SHOULDER, false);
+            Vec3 side = new Vec3(left ? -0.32 : 0.32, 0.0, 0.0).yRot(-(float) Math.toRadians(this.getYRot()));
             return base.add(side.x, -0.42, side.z);
         }
         return base;

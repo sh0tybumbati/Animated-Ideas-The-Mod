@@ -33,8 +33,14 @@ public class DoodleBookScreen extends Screen {
         toolIcon("brush"), toolIcon("fill"), toolIcon("eyedropper"), toolIcon("line")
     };
 
+    private static final ResourceLocation CLEAR_ICON = toolIcon("clear");
+
     private static ResourceLocation toolIcon(String name) {
         return ResourceLocation.fromNamespaceAndPath(GarrettMod.MOD_ID, "textures/gui/" + name + ".png");
+    }
+
+    private int clearX() {
+        return canvasX + TOOL_ICONS.length * (TOOL_CELL + 2) + 6;
     }
 
     private final InteractionHand hand;
@@ -98,9 +104,6 @@ public class DoodleBookScreen extends Screen {
             .pos(canvasX + CANVAS_PX / 2 - 40, by).size(80, 20).build());
         addRenderableWidget(Button.builder(Component.literal(">"), b -> nextPage()).pos(canvasX + CANVAS_PX - 20, by).size(20, 20).build());
 
-        // Clear sits at the right end of the top toolbar.
-        addRenderableWidget(Button.builder(Component.literal("Clear"), b -> clearPage())
-            .pos(canvasX + CANVAS_PX - 48, toolY() - 2).size(48, TOOL_CELL + 4).build());
 
         image = new NativeImage(NativeImage.Format.RGBA, GRID, GRID, false);
         texture = new DynamicTexture(image);
@@ -225,6 +228,10 @@ public class DoodleBookScreen extends Screen {
                 return true;
             }
         }
+        if (mx >= clearX() && mx < clearX() + TOOL_CELL && my >= ty && my < ty + TOOL_CELL) {
+            clearPage();
+            return true;
+        }
         return false;
     }
 
@@ -343,6 +350,10 @@ public class DoodleBookScreen extends Screen {
             g.blit(TOOL_ICONS[t], sx, ty, 0f, 0f, TOOL_CELL, TOOL_CELL, TOOL_CELL, TOOL_CELL);
             if (tool == t) g.renderOutline(sx - 1, ty - 1, TOOL_CELL + 2, TOOL_CELL + 2, 0xFFFFFFFF);
         }
+        // Clear action button (icon) at the end of the toolbar
+        int cx = clearX();
+        g.fill(cx, ty, cx + TOOL_CELL, ty + TOOL_CELL, 0xFF_504030);
+        g.blit(CLEAR_ICON, cx, ty, 0f, 0f, TOOL_CELL, TOOL_CELL, TOOL_CELL, TOOL_CELL);
 
         g.drawString(font, "Page " + (page + 1) + " / " + pages.size(), palX, eraserY() + PAL_CELL + 8, 0xFFE8C880, false);
 
