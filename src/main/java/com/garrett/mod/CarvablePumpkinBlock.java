@@ -119,8 +119,9 @@ public class CarvablePumpkinBlock extends BaseEntityBlock {
             case WEST  -> { u = lz;       v = 1.0 - ly; }
             default    -> { return -1; }
         }
-        int px = (int) Math.min(7, Math.max(0, u * 8));
-        int py = (int) Math.min(7, Math.max(0, v * 8));
-        return py * 8 + px;
+        int n = CarvablePumpkinBlockEntity.SIZE;
+        int px = (int) Math.min(n - 1, Math.max(0, u * n));
+        int py = (int) Math.min(n - 1, Math.max(0, v * n));
+        return py * n + px;
     }
 }

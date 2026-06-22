@@ -48,21 +48,20 @@ public class CarvablePumpkinBlockEntityRenderer implements BlockEntityRenderer<C
         int onColor = lit ? CARVED_GLOW : CARVED_DARK;
         int light = lit ? LightTexture.FULL_BRIGHT : packedLight;
 
+        int n = CarvablePumpkinBlockEntity.SIZE;
         for (Direction face : HORIZONTALS) {
-            long mask = entity.getCarved(face);
-            if (mask == 0L) continue; // nothing carved on this face
+            if (entity.faceEmpty(face)) continue; // nothing carved on this face
 
             String key = pos.getX() + "_" + pos.getY() + "_" + pos.getZ() + "_" + face.getName();
-            DynamicTexture tex = TEXTURES.computeIfAbsent(key, k -> new DynamicTexture(8, 8, false));
+            DynamicTexture tex = TEXTURES.computeIfAbsent(key, k -> new DynamicTexture(n, n, false));
             ResourceLocation texLoc = TEX_LOCS.computeIfAbsent(key, k ->
                 Minecraft.getInstance().getTextureManager().register("carvable_pumpkin/" + k.replace('-', 'n'), tex));
 
             var img = tex.getPixels();
             if (img != null) {
-                for (int y = 0; y < 8; y++) {
-                    for (int x = 0; x < 8; x++) {
-                        boolean c = (mask & (1L << (y * 8 + x))) != 0;
-                        img.setPixelRGBA(x, y, c ? onColor : CLEAR);
+                for (int y = 0; y < n; y++) {
+                    for (int x = 0; x < n; x++) {
+                        img.setPixelRGBA(x, y, entity.isCarved(face, y * n + x) ? onColor : CLEAR);
                     }
                 }
                 tex.upload();

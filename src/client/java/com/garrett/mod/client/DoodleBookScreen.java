@@ -4,7 +4,6 @@ import com.garrett.mod.DoodleBookItem;
 import com.garrett.mod.DoodleBookSavePayload;
 import com.garrett.mod.GarrettMod;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -16,200 +15,333 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayDeque;
+import java.util.List;
+
+/** A multi-page 64x64 drawing screen with MS-Paint-style tools (brush, fill, eyedropper, line). */
 public class DoodleBookScreen extends Screen {
-    private static final int GRID = 16;
-    private static final int CELL = 12;          // pixels per cell on screen
-    private static final int PAL_CELL = 14;      // palette swatch size
-    private static final int PAL_COLS = 8;
-    private static final int CANVAS_W = GRID * CELL;
-    private static final int CANVAS_H = GRID * CELL;
+    private static final int GRID = DoodleBookItem.GRID;  // 64
+    private static final int CANVAS_PX = 256;             // on-screen canvas size
+    private static final int CELL = CANVAS_PX / GRID;     // 4 px per drawn pixel
+    private static final int PAL_CELL = 14;
+    private static final int PAL_COLS = 4;
+    private static final int PARCHMENT = 0xF5F5DC;
+
+    private static final int BRUSH = 0, FILL = 1, EYEDROPPER = 2, LINE = 3;
+    private static final int TOOL_CELL = 16;
+    private static final String[] TOOL_LABELS = {"B", "F", "I", "L"};
 
     private final InteractionHand hand;
-    private final byte[] pixels;                 // 256 bytes, index = DyeColor ordinal, 0 = empty
-    private int selectedColor = 1;               // 1-16 = dye, 0 = eraser
+    private final List<byte[]> pages;
+    private int page = 0;
+    private int selectedColor = 1;                        // 0 = eraser, 1-16 = dye id + 1
+    private int tool = BRUSH;
 
-    private DynamicTexture previewTexture;
-    private ResourceLocation previewId;
-    private NativeImage previewImage;
-    private boolean textureDirty = true;
+    // Line tool drag state (grid coords).
+    private boolean drawingLine = false;
+    private int lineStartX, lineStartY;
 
-    private int canvasX, canvasY;                // top-left of the drawing canvas on screen
-    private int palX, palY;                      // top-left of the palette
+    private NativeImage image;
+    private DynamicTexture texture;
+    private ResourceLocation textureId;
+    private boolean dirty = true;
+    private boolean closed = false;
 
-    private static final int[] DYE_ARGB = new int[16];
+    private int canvasX, canvasY, palX, palY;
+
+    private static final int[] DYE_RGB = new int[16];
     static {
-        for (DyeColor c : DyeColor.values()) {
-            int col = c.getTextureDiffuseColor();
-            DYE_ARGB[c.getId()] = 0xFF000000 | col;
-        }
+        for (DyeColor c : DyeColor.values()) DYE_RGB[c.getId()] = c.getTextureDiffuseColor() & 0xFFFFFF;
     }
 
     public DoodleBookScreen(InteractionHand hand, ItemStack stack) {
         super(Component.translatable("item.gtcai.doodle_book"));
         this.hand = hand;
-        byte[] raw = DoodleBookItem.getPixels(stack);
-        this.pixels = new byte[GRID * GRID];
-        System.arraycopy(raw, 0, pixels, 0, Math.min(raw.length, pixels.length));
+        this.pages = DoodleBookItem.getPages(stack);
+    }
+
+    private byte[] cur() {
+        return pages.get(page);
+    }
+
+    private int eraserY() {
+        return palY + (16 / PAL_COLS) * PAL_CELL + 2;
+    }
+
+    private int toolY() {
+        return eraserY() + PAL_CELL + 6;
+    }
+
+    private int displayColor(int v) {
+        return (v >= 1 && v <= 16) ? (0xFF000000 | DYE_RGB[v - 1]) : (0xFF000000 | PARCHMENT);
     }
 
     @Override
     protected void init() {
-        int panelW = CANVAS_W + 4 + PAL_COLS * PAL_CELL + 6;
-        int panelH = Math.max(CANVAS_H, 2 * GRID * PAL_CELL) + 30;
-        canvasX = (width - panelW) / 2 + 2;
-        canvasY = (height - panelH) / 2 + 2;
-        palX = canvasX + CANVAS_W + 4;
+        int blockW = CANVAS_PX + 14 + PAL_COLS * PAL_CELL;
+        int blockH = CANVAS_PX + 60;
+        canvasX = (width - blockW) / 2 + 4;
+        canvasY = (height - blockH) / 2 + 16;
+        palX = canvasX + CANVAS_PX + 6;
         palY = canvasY;
 
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), btn -> save())
-            .pos(canvasX + CANVAS_W / 2 - 50, canvasY + CANVAS_H + 4)
-            .size(100, 20).build());
+        int by = canvasY + CANVAS_PX + 6;
+        addRenderableWidget(Button.builder(Component.literal("<"), b -> prevPage()).pos(canvasX, by).size(20, 20).build());
+        addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
+            .pos(canvasX + CANVAS_PX / 2 - 40, by).size(80, 20).build());
+        addRenderableWidget(Button.builder(Component.literal(">"), b -> nextPage()).pos(canvasX + CANVAS_PX - 20, by).size(20, 20).build());
 
-        // Build the preview texture
-        previewImage = new NativeImage(NativeImage.Format.RGBA, GRID, GRID, false);
-        previewTexture = new DynamicTexture(previewImage);
-        previewId = ResourceLocation.fromNamespaceAndPath(GarrettMod.MOD_ID, "doodle_preview");
+        addRenderableWidget(Button.builder(Component.literal("Clear"), b -> clearPage())
+            .pos(palX, toolY() + TOOL_CELL + 6).size(Math.max(60, PAL_COLS * PAL_CELL), 16).build());
+
+        image = new NativeImage(NativeImage.Format.RGBA, GRID, GRID, false);
+        texture = new DynamicTexture(image);
+        textureId = ResourceLocation.fromNamespaceAndPath(GarrettMod.MOD_ID, "doodle_preview");
         assert minecraft != null;
-        minecraft.getTextureManager().register(previewId, previewTexture);
-        textureDirty = true;
+        minecraft.getTextureManager().register(textureId, texture);
+        dirty = true;
+    }
+
+    private void clearPage() {
+        java.util.Arrays.fill(cur(), (byte) 0);
+        dirty = true;
+    }
+
+    private void persistCurrent() {
+        ClientPlayNetworking.send(new DoodleBookSavePayload(page, cur().clone()));
+    }
+
+    private void prevPage() {
+        if (page <= 0) return;
+        persistCurrent();
+        page--;
+        dirty = true;
+    }
+
+    private void nextPage() {
+        persistCurrent();
+        if (page < pages.size() - 1) {
+            page++;
+        } else if (pages.size() < DoodleBookItem.MAX_PAGES) {
+            pages.add(new byte[DoodleBookItem.PAGE_BYTES]);
+            page++;
+        }
+        dirty = true;
     }
 
     @Override
     public void onClose() {
-        save();
+        if (!closed) {
+            closed = true;
+            persistCurrent();
+            assert minecraft != null;
+            if (texture != null) {
+                minecraft.getTextureManager().release(textureId);
+                texture = null;
+            }
+        }
         super.onClose();
     }
 
-    private void save() {
-        ClientPlayNetworking.send(new DoodleBookSavePayload(pixels.clone()));
-        assert minecraft != null;
-        if (previewTexture != null) {
-            minecraft.getTextureManager().release(previewId);
-            previewTexture = null;
-        }
-        onClose();
-    }
+    // --- input ---
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (tryPaint(mx, my)) return true;
+        if (uiHit(mx, my)) return true;
+        int idx = canvasIndex(mx, my);
+        if (idx >= 0) {
+            switch (tool) {
+                case FILL -> floodFill(idx);
+                case EYEDROPPER -> selectedColor = cur()[idx] & 0xFF;
+                case LINE -> {
+                    lineStartX = idx % GRID;
+                    lineStartY = idx / GRID;
+                    drawingLine = true;
+                }
+                default -> {
+                    cur()[idx] = (byte) selectedColor;
+                    dirty = true;
+                }
+            }
+            return true;
+        }
         return super.mouseClicked(mx, my, button);
     }
 
     @Override
     public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
-        if (tryPaint(mx, my)) return true;
+        if (tool == BRUSH) {
+            int idx = canvasIndex(mx, my);
+            if (idx >= 0) {
+                cur()[idx] = (byte) selectedColor;
+                dirty = true;
+                return true;
+            }
+        }
         return super.mouseDragged(mx, my, button, dx, dy);
     }
 
-    private boolean tryPaint(double mx, double my) {
-        // Check palette
+    @Override
+    public boolean mouseReleased(double mx, double my, int button) {
+        if (drawingLine) {
+            drawingLine = false;
+            int[] end = clampCell(mx, my);
+            bresenham(lineStartX, lineStartY, end[0], end[1], (x, y) -> cur()[y * GRID + x] = (byte) selectedColor);
+            dirty = true;
+            return true;
+        }
+        return super.mouseReleased(mx, my, button);
+    }
+
+    /** Palette / eraser / tool-button hit tests; returns true if a selection changed. */
+    private boolean uiHit(double mx, double my) {
         for (DyeColor c : DyeColor.values()) {
             int idx = c.getId();
-            int col = idx % PAL_COLS;
-            int row = idx / PAL_COLS;
-            int sx = palX + col * PAL_CELL;
-            int sy = palY + row * PAL_CELL;
+            int sx = palX + (idx % PAL_COLS) * PAL_CELL;
+            int sy = palY + (idx / PAL_COLS) * PAL_CELL;
             if (mx >= sx && mx < sx + PAL_CELL - 1 && my >= sy && my < sy + PAL_CELL - 1) {
                 selectedColor = idx + 1;
                 return true;
             }
         }
-        // Eraser at bottom of palette
-        int eraserX = palX;
-        int eraserY = palY + (16 / PAL_COLS) * PAL_CELL + 2;
-        if (mx >= eraserX && mx < eraserX + PAL_CELL * 2 && my >= eraserY && my < eraserY + PAL_CELL - 1) {
+        int ey = eraserY();
+        if (mx >= palX && mx < palX + PAL_CELL * 2 && my >= ey && my < ey + PAL_CELL - 1) {
             selectedColor = 0;
             return true;
         }
-        // Check canvas
-        int gx = (int) ((mx - canvasX) / CELL);
-        int gy = (int) ((my - canvasY) / CELL);
-        if (gx >= 0 && gx < GRID && gy >= 0 && gy < GRID) {
-            pixels[gy * GRID + gx] = (byte) selectedColor;
-            textureDirty = true;
-            return true;
+        int ty = toolY();
+        for (int t = 0; t < TOOL_LABELS.length; t++) {
+            int sx = palX + t * (TOOL_CELL + 2);
+            if (mx >= sx && mx < sx + TOOL_CELL && my >= ty && my < ty + TOOL_CELL) {
+                tool = t;
+                return true;
+            }
         }
         return false;
     }
 
-    private void updateTexture() {
-        if (!textureDirty || previewImage == null) return;
+    private int canvasIndex(double mx, double my) {
+        int gx = (int) ((mx - canvasX) / CELL);
+        int gy = (int) ((my - canvasY) / CELL);
+        return (gx >= 0 && gx < GRID && gy >= 0 && gy < GRID) ? gy * GRID + gx : -1;
+    }
+
+    private int[] clampCell(double mx, double my) {
+        int gx = Math.max(0, Math.min(GRID - 1, (int) ((mx - canvasX) / CELL)));
+        int gy = Math.max(0, Math.min(GRID - 1, (int) ((my - canvasY) / CELL)));
+        return new int[]{gx, gy};
+    }
+
+    private void floodFill(int idx) {
+        byte[] p = cur();
+        byte target = p[idx];
+        byte replacement = (byte) selectedColor;
+        if (target == replacement) return;
+        ArrayDeque<Integer> stack = new ArrayDeque<>();
+        stack.push(idx);
+        while (!stack.isEmpty()) {
+            int i = stack.pop();
+            if (p[i] != target) continue;
+            p[i] = replacement;
+            int x = i % GRID, y = i / GRID;
+            if (x > 0) stack.push(i - 1);
+            if (x < GRID - 1) stack.push(i + 1);
+            if (y > 0) stack.push(i - GRID);
+            if (y < GRID - 1) stack.push(i + GRID);
+        }
+        dirty = true;
+    }
+
+    @FunctionalInterface
+    private interface PointOp { void at(int x, int y); }
+
+    private static void bresenham(int x0, int y0, int x1, int y1, PointOp op) {
+        int dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+        int sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+        int err = dx + dy;
+        while (true) {
+            op.at(x0, y0);
+            if (x0 == x1 && y0 == y1) break;
+            int e2 = 2 * err;
+            if (e2 >= dy) { err += dy; x0 += sx; }
+            if (e2 <= dx) { err += dx; y0 += sy; }
+        }
+    }
+
+    // --- rendering ---
+
+    private void refreshTexture() {
+        if (!dirty || image == null) return;
+        byte[] p = cur();
         for (int y = 0; y < GRID; y++) {
             for (int x = 0; x < GRID; x++) {
-                int v = pixels[y * GRID + x] & 0xFF;
-                int argb;
-                if (v == 0) {
-                    argb = 0xFF_F5F5DC; // parchment
-                } else {
-                    DyeColor dc = DyeColor.byId(v - 1);
-                    argb = dc != null ? DYE_ARGB[dc.getId()] : 0xFF_F5F5DC;
-                }
-                // NativeImage uses ABGR internally
-                int a = (argb >> 24) & 0xFF;
-                int r = (argb >> 16) & 0xFF;
-                int g = (argb >> 8)  & 0xFF;
-                int b =  argb        & 0xFF;
-                previewImage.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+                int v = p[y * GRID + x] & 0xFF;
+                int rgb = (v >= 1 && v <= 16) ? DYE_RGB[v - 1] : PARCHMENT;
+                int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+                image.setPixelRGBA(x, y, 0xFF000000 | (b << 16) | (g << 8) | r); // ABGR
             }
         }
-        previewTexture.upload();
-        textureDirty = false;
+        texture.upload();
+        dirty = false;
+    }
+
+    // Plain dim instead of the vanilla/Blur-mod blurred background.
+    @Override
+    public void renderBackground(GuiGraphics g, int mx, int my, float delta) {
+        g.fill(0, 0, width, height, 0x66_101010);
     }
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float delta) {
         renderBackground(g, mx, my, delta);
-        updateTexture();
+        refreshTexture();
 
-        // Background panel
-        g.fill(canvasX - 4, canvasY - 14, canvasX + CANVAS_W + 4 + PAL_COLS * PAL_CELL + 6, canvasY + CANVAS_H + 28, 0xC0_2A1A0A);
-        g.drawCenteredString(font, title, canvasX + CANVAS_W / 2, canvasY - 12, 0xFFE8C880);
+        g.fill(canvasX - 4, canvasY - 14, palX + PAL_COLS * PAL_CELL + 2, canvasY + CANVAS_PX + 30, 0xFF_2A1A0A);
+        g.drawCenteredString(font, title, canvasX + CANVAS_PX / 2, canvasY - 12, 0xFFE8C880);
 
-        // Draw canvas cells
-        for (int y = 0; y < GRID; y++) {
-            for (int x = 0; x < GRID; x++) {
-                int v = pixels[y * GRID + x] & 0xFF;
-                int color;
-                if (v == 0) {
-                    color = 0xFF_F5F5DC;
-                } else {
-                    DyeColor dc = DyeColor.byId(v - 1);
-                    color = dc != null ? (0xFF000000 | dc.getTextureDiffuseColor()) : 0xFF_F5F5DC;
-                }
-                int px = canvasX + x * CELL;
-                int py = canvasY + y * CELL;
-                g.fill(px, py, px + CELL - 1, py + CELL - 1, color);
-            }
+        // 64x64 page scaled up to the canvas area
+        g.blit(textureId, canvasX, canvasY, CANVAS_PX, CANVAS_PX, 0f, 0f, GRID, GRID, GRID, GRID);
+        g.renderOutline(canvasX - 1, canvasY - 1, CANVAS_PX + 2, CANVAS_PX + 2, 0xFF_806040);
+
+        // Line preview (not yet committed)
+        if (drawingLine) {
+            int[] end = clampCell(mx, my);
+            int color = displayColor(selectedColor);
+            bresenham(lineStartX, lineStartY, end[0], end[1], (x, y) -> {
+                int px = canvasX + x * CELL, py = canvasY + y * CELL;
+                g.fill(px, py, px + CELL, py + CELL, color);
+            });
         }
-        // Canvas grid border
-        g.renderOutline(canvasX - 1, canvasY - 1, CANVAS_W + 2, CANVAS_H + 2, 0xFF_806040);
 
-        // Draw palette
-        g.drawString(font, "Colors:", palX, palY - 10, 0xFF_E8C880, false);
+        // Palette
         for (DyeColor c : DyeColor.values()) {
             int idx = c.getId();
-            int col = idx % PAL_COLS;
-            int row = idx / PAL_COLS;
-            int sx = palX + col * PAL_CELL;
-            int sy = palY + row * PAL_CELL;
+            int sx = palX + (idx % PAL_COLS) * PAL_CELL;
+            int sy = palY + (idx / PAL_COLS) * PAL_CELL;
             g.fill(sx, sy, sx + PAL_CELL - 1, sy + PAL_CELL - 1, 0xFF000000 | c.getTextureDiffuseColor());
-            if (selectedColor == idx + 1) {
-                g.renderOutline(sx - 1, sy - 1, PAL_CELL + 1, PAL_CELL + 1, 0xFF_FFFFFF);
-            }
+            if (selectedColor == idx + 1) g.renderOutline(sx - 1, sy - 1, PAL_CELL + 1, PAL_CELL + 1, 0xFFFFFFFF);
         }
-        // Eraser
-        int eraserX = palX;
-        int eraserY = palY + (16 / PAL_COLS) * PAL_CELL + 2;
-        g.fill(eraserX, eraserY, eraserX + PAL_CELL * 2 - 1, eraserY + PAL_CELL - 1, 0xFF_F5F5DC);
-        g.drawString(font, "X", eraserX + 4, eraserY + 3, 0xFF_000000, false);
-        if (selectedColor == 0) {
-            g.renderOutline(eraserX - 1, eraserY - 1, PAL_CELL * 2 + 1, PAL_CELL + 1, 0xFF_FFFFFF);
+        int ey = eraserY();
+        g.fill(palX, ey, palX + PAL_CELL * 2 - 1, ey + PAL_CELL - 1, 0xFF000000 | PARCHMENT);
+        g.drawString(font, "X", palX + 4, ey + 3, 0xFF000000, false);
+        if (selectedColor == 0) g.renderOutline(palX - 1, ey - 1, PAL_CELL * 2 + 1, PAL_CELL + 1, 0xFFFFFFFF);
+
+        // Tool buttons
+        int ty = toolY();
+        for (int t = 0; t < TOOL_LABELS.length; t++) {
+            int sx = palX + t * (TOOL_CELL + 2);
+            g.fill(sx, ty, sx + TOOL_CELL, ty + TOOL_CELL, 0xFF_504030);
+            g.drawCenteredString(font, TOOL_LABELS[t], sx + TOOL_CELL / 2, ty + 4, 0xFFE8C880);
+            if (tool == t) g.renderOutline(sx - 1, ty - 1, TOOL_CELL + 2, TOOL_CELL + 2, 0xFFFFFFFF);
         }
+
+        g.drawString(font, "Page " + (page + 1) + " / " + pages.size(), palX, ty + TOOL_CELL + 28, 0xFFE8C880, false);
 
         super.render(g, mx, my, delta);
     }
 
     @Override
-    public boolean isPauseScreen() { return false; }
+    public boolean isPauseScreen() {
+        return false;
+    }
 }

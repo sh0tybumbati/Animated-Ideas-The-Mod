@@ -1,6 +1,7 @@
 package com.garrett.mod.client;
 
 import com.garrett.mod.CanvasBlock;
+import com.garrett.mod.DoodleBookItem;
 import com.garrett.mod.GarrettMod;
 import com.garrett.mod.GunpowderBlock;
 import net.fabricmc.api.ClientModInitializer;
@@ -9,11 +10,15 @@ import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 
 public class GarrettModClient implements ClientModInitializer {
 	@Override
@@ -57,5 +62,15 @@ public class GarrettModClient implements ClientModInitializer {
 		if (GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY != null) {
 			BlockEntityRenderers.register(GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY, CarvablePumpkinBlockEntityRenderer::new);
 		}
+
+		// Right-click a doodle book to open the drawing screen (client-side only).
+		UseItemCallback.EVENT.register((player, world, hand) -> {
+			ItemStack stack = player.getItemInHand(hand);
+			if (GarrettMod.CONFIG.enableDoodleBooks && world.isClientSide() && stack.getItem() instanceof DoodleBookItem) {
+				Minecraft.getInstance().setScreen(new DoodleBookScreen(hand, stack));
+				return InteractionResultHolder.success(stack);
+			}
+			return InteractionResultHolder.pass(stack);
+		});
 	}
 }

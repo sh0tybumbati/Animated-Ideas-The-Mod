@@ -1,0 +1,12 @@
+{
+  "fabric:load_conditions": [
+    { "condition": "fabric:registry_contains", "registry": "minecraft:item", "values": ["gtcai:doodle_book"] }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    { "item": "minecraft:book" },
+    { "item": "minecraft:feather" },
+    { "tag": "c:dyes" }
+  ],
+  "result": { "id": "gtcai:doodle_book", "count": 1 }
+}

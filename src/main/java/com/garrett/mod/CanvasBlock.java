@@ -34,13 +34,16 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class CanvasBlock extends BaseEntityBlock {
 
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty WAXED = BooleanProperty.create("waxed");
 
+    // The 2px slab sits against the support block (opposite the facing direction).
     private static final VoxelShape SHAPE_NORTH = Block.box(0, 0, 14, 16, 16, 16);
     private static final VoxelShape SHAPE_SOUTH = Block.box(0, 0, 0, 16, 16, 2);
     private static final VoxelShape SHAPE_EAST  = Block.box(0, 0, 0, 2, 16, 16);
     private static final VoxelShape SHAPE_WEST  = Block.box(14, 0, 0, 16, 16, 16);
+    private static final VoxelShape SHAPE_UP     = Block.box(0, 0, 0, 16, 2, 16);
+    private static final VoxelShape SHAPE_DOWN   = Block.box(0, 14, 0, 16, 16, 16);
 
     public final DyeColor color;     // null for transparent variant
     public final boolean transparent;
@@ -75,7 +78,8 @@ public class CanvasBlock extends BaseEntityBlock {
             case SOUTH -> SHAPE_SOUTH;
             case EAST  -> SHAPE_EAST;
             case WEST  -> SHAPE_WEST;
-            default    -> SHAPE_NORTH;
+            case UP    -> SHAPE_UP;
+            case DOWN  -> SHAPE_DOWN;
         };
     }
 
@@ -87,7 +91,6 @@ public class CanvasBlock extends BaseEntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction face = context.getClickedFace();
-        if (!face.getAxis().isHorizontal()) return null;
         BlockState state = defaultBlockState().setValue(FACING, face).setValue(WAXED, false);
         return state.canSurvive(context.getLevel(), context.getClickedPos()) ? state : null;
     }
@@ -101,7 +104,10 @@ public class CanvasBlock extends BaseEntityBlock {
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         Direction facing = state.getValue(FACING);
         BlockPos supportPos = pos.relative(facing.getOpposite());
-        return level.getBlockState(supportPos).isFaceSturdy(level, supportPos, facing);
+        BlockState support = level.getBlockState(supportPos);
+        // Attach to anything with a collision box (full blocks, fences, walls, slabs),
+        // but not non-solid decorations like flowers or torches.
+        return !support.getCollisionShape(level, supportPos).isEmpty();
     }
 
     @Override
@@ -178,6 +184,8 @@ public class CanvasBlock extends BaseEntityBlock {
             case SOUTH -> { u = lx;       v = 1.0 - ly; }
             case EAST  -> { u = 1.0 - lz; v = 1.0 - ly; }
             case WEST  -> { u = lz;       v = 1.0 - ly; }
+            case UP    -> { u = 1.0 - lx; v = 1.0 - lz; }
+            case DOWN  -> { u = 1.0 - lx; v = lz; }
             default    -> { return -1; }
         }
 

@@ -112,6 +112,8 @@ public class GarrettMod implements ModInitializer {
 		new Item.Properties().stacksTo(1)
 	);
 
+	public static final Item DOODLE_BOOK = new DoodleBookItem(new Item.Properties().stacksTo(1));
+
 	public static EntityType<ThrownMilkPotion> THROWN_MILK_POTION_ENTITY_TYPE;
 
 	public static final ResourceKey<CreativeModeTab> ITEM_GROUP_KEY =
@@ -150,6 +152,26 @@ public class GarrettMod implements ModInitializer {
 			AIR_FRYER_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
 				ResourceLocation.fromNamespaceAndPath(MOD_ID, "air_fryer"),
 				BlockEntityType.Builder.of(AirFryerBlockEntity::new, AIR_FRYER_BLOCK).build(null));
+		}
+
+		if (CONFIG.enableDoodleBooks) {
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "doodle_book"), DOODLE_BOOK);
+			PayloadTypeRegistry.playC2S().register(DoodleBookSavePayload.TYPE, DoodleBookSavePayload.CODEC);
+			ServerPlayNetworking.registerGlobalReceiver(DoodleBookSavePayload.TYPE, (payload, context) -> {
+				byte[] px = payload.pixels();
+				int page = payload.page();
+				if (px.length != DoodleBookSavePayload.SIZE || page < 0 || page >= DoodleBookItem.MAX_PAGES) return;
+				context.server().execute(() -> {
+					ServerPlayer p = context.player();
+					for (InteractionHand h : InteractionHand.values()) {
+						ItemStack s = p.getItemInHand(h);
+						if (s.getItem() instanceof DoodleBookItem) {
+							DoodleBookItem.setPage(s, page, px);
+							break;
+						}
+					}
+				});
+			});
 		}
 
 		if (CONFIG.enableCustomPumpkinCarving) {
@@ -352,6 +374,7 @@ public class GarrettMod implements ModInitializer {
 
 		ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP_KEY).register(entries -> {
 			if (CONFIG.enableAirFryer) entries.accept(AIR_FRYER_BLOCK);
+			if (CONFIG.enableDoodleBooks) entries.accept(DOODLE_BOOK);
 			if (CONFIG.enableSandwiches) {
 				for (Item sandwich : Sandwiches.ITEMS.values()) entries.accept(sandwich);
 			}

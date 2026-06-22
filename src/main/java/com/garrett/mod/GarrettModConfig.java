@@ -47,4 +47,7 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableCustomPumpkinCarving = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableDoodleBooks = true;
 }

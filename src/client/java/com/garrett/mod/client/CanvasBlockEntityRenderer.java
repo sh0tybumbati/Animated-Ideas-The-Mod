@@ -91,14 +91,14 @@ public class CanvasBlockEntityRenderer implements BlockEntityRenderer<CanvasBloc
 
     private void setupFacingTransform(PoseStack stack, Direction facing) {
         stack.translate(0.5, 0.5, 0.5);
-        float yRot = switch (facing) {
-            case NORTH -> 0;
-            case SOUTH -> 180;
-            case EAST  -> -90;
-            case WEST  -> 90;
-            default    -> 0;
-        };
-        stack.mulPose(Axis.YP.rotationDegrees(yRot));
+        switch (facing) {
+            case SOUTH -> stack.mulPose(Axis.YP.rotationDegrees(180));
+            case EAST  -> stack.mulPose(Axis.YP.rotationDegrees(-90));
+            case WEST  -> stack.mulPose(Axis.YP.rotationDegrees(90));
+            case UP    -> stack.mulPose(Axis.XP.rotationDegrees(90));   // lay flat on a floor
+            case DOWN  -> stack.mulPose(Axis.XP.rotationDegrees(-90));  // hang under a ceiling
+            default    -> {} // NORTH
+        }
         stack.translate(-0.5, -0.5, -0.5);
     }
 }

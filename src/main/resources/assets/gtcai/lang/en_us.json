@@ -88,5 +88,8 @@
   "text.autoconfig.gtcai.option.enableAirFryer.@Tooltip": "A food-only cooker that is faster than a smoker but burns fuel twice as fast.",
   "block.gtcai.carvable_pumpkin": "Carvable Pumpkin",
   "text.autoconfig.gtcai.option.enableCustomPumpkinCarving": "Custom Pumpkin Carving",
-  "text.autoconfig.gtcai.option.enableCustomPumpkinCarving.@Tooltip": "Carve your own face into a pumpkin with a sword, then light it with flint and steel."
+  "text.autoconfig.gtcai.option.enableCustomPumpkinCarving.@Tooltip": "Carve your own face into a pumpkin with a sword, then light it with flint and steel.",
+  "item.gtcai.doodle_book": "Doodle Book",
+  "text.autoconfig.gtcai.option.enableDoodleBooks": "Doodle Books",
+  "text.autoconfig.gtcai.option.enableDoodleBooks.@Tooltip": "A book you can draw a 16x16 doodle in, MS-Paint style."
 }
