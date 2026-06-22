@@ -40,3 +40,24 @@
 
 ## v1.2.0
 - **Custom Pumpkin Carving**: carve an 8×8 grid into each of a pumpkin's four faces with a sword; light it with flint &amp; steel for a jack-o'-lantern glow. Breaking drops a carving-preserving item.
+
+## v1.1.0
+- **Physical Trident Hitboxes** reworked: only **wall-stuck** tridents are solid, with a thin, end-rod-shaped collision box (parkour-friendly); ground-stuck tridents no longer block others from landing.
+- Wooden trapdoor recipes now yield **24**.
+- README refreshed to the current feature set.
+
+## v1.0.x — Part 2 sprint
+- Fixed the build (migrated to the Minecraft 1.21 Data Components API).
+- **Sandwiches** expanded to (almost) every edible food, with **inherited effects** — spider eye poisons, golden apples buff, chorus teleports, honey clears poison, etc.
+- **Air Fryer**: a food-only cooker — twice as fast as a smoker but burns fuel twice as fast.
+- **Logical Stairs & Trapdoors** reworked as real recipe overrides (stairs 3→4 across all vanilla types; wooden trapdoors boosted).
+- **Creative tab** added for all mod items.
+- Crash/render fixes: canvas break, trident mixin, thrown milk-potion renderer; canvas model rewrite (no z-fighting); gunpowder now renders like redstone wire (darker tint).
+- Made per-feature config toggles actually work; added missing translations.
+
+## v1.0.x — Initial release
+**Part 1:** Sandwiches, Paintable Canvases (16 colors + transparent, brush/dye, eyedropper, honeycomb wax), Placeable Gunpowder, Placeable Milk, Repairable Anvils, Co-op Mining, Logical Stairs &amp; Trapdoors.
+
+**Standalone:** Parrots on Armor Stands, Gunpowder explodes in furnaces.
+
+**Part 2 (initial):** Placeable Pumpkin Pie, Splash Potion of Milk, Dangerous Stonecutters, Physical Trident Hitboxes.
