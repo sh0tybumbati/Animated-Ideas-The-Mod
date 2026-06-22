@@ -29,7 +29,13 @@ public class DoodleBookScreen extends Screen {
 
     private static final int BRUSH = 0, FILL = 1, EYEDROPPER = 2, LINE = 3;
     private static final int TOOL_CELL = 16;
-    private static final String[] TOOL_LABELS = {"B", "F", "I", "L"};
+    private static final ResourceLocation[] TOOL_ICONS = {
+        toolIcon("brush"), toolIcon("fill"), toolIcon("eyedropper"), toolIcon("line")
+    };
+
+    private static ResourceLocation toolIcon(String name) {
+        return ResourceLocation.fromNamespaceAndPath(GarrettMod.MOD_ID, "textures/gui/" + name + ".png");
+    }
 
     private final InteractionHand hand;
     private final List<byte[]> pages;
@@ -210,7 +216,7 @@ public class DoodleBookScreen extends Screen {
             return true;
         }
         int ty = toolY();
-        for (int t = 0; t < TOOL_LABELS.length; t++) {
+        for (int t = 0; t < TOOL_ICONS.length; t++) {
             int sx = palX + t * (TOOL_CELL + 2);
             if (mx >= sx && mx < sx + TOOL_CELL && my >= ty && my < ty + TOOL_CELL) {
                 tool = t;
@@ -328,10 +334,10 @@ public class DoodleBookScreen extends Screen {
 
         // Tool buttons
         int ty = toolY();
-        for (int t = 0; t < TOOL_LABELS.length; t++) {
+        for (int t = 0; t < TOOL_ICONS.length; t++) {
             int sx = palX + t * (TOOL_CELL + 2);
             g.fill(sx, ty, sx + TOOL_CELL, ty + TOOL_CELL, 0xFF_504030);
-            g.drawCenteredString(font, TOOL_LABELS[t], sx + TOOL_CELL / 2, ty + 4, 0xFFE8C880);
+            g.blit(TOOL_ICONS[t], sx, ty, 0f, 0f, TOOL_CELL, TOOL_CELL, TOOL_CELL, TOOL_CELL);
             if (tool == t) g.renderOutline(sx - 1, ty - 1, TOOL_CELL + 2, TOOL_CELL + 2, 0xFFFFFFFF);
         }
 
