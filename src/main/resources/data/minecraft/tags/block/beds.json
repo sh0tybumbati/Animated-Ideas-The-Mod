@@ -1,1 +1,21 @@
-{ "replace": false, "values": [ "gtcai:sleeping_bag" ] }
+{
+  "replace": false,
+  "values": [
+    "gtcai:white_sleeping_bag",
+    "gtcai:orange_sleeping_bag",
+    "gtcai:magenta_sleeping_bag",
+    "gtcai:light_blue_sleeping_bag",
+    "gtcai:yellow_sleeping_bag",
+    "gtcai:lime_sleeping_bag",
+    "gtcai:pink_sleeping_bag",
+    "gtcai:gray_sleeping_bag",
+    "gtcai:light_gray_sleeping_bag",
+    "gtcai:cyan_sleeping_bag",
+    "gtcai:purple_sleeping_bag",
+    "gtcai:blue_sleeping_bag",
+    "gtcai:brown_sleeping_bag",
+    "gtcai:green_sleeping_bag",
+    "gtcai:red_sleeping_bag",
+    "gtcai:black_sleeping_bag"
+  ]
+}

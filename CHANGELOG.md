@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.4.1
+- **Sleeping Bags** now come in all **16 dye colors** (like beds), each crafted from 3 matching wool + 3 string. They use the vanilla bed top textures per color — head half with the pillow, foot half plain — so a placed bag reads as a bed laid flat.
+
 ## v1.4.0
 **Part 3 begins**
 

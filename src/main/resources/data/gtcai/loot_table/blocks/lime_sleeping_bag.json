@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "gtcai:lime_sleeping_bag"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "gtcai:lime_sleeping_bag",
+          "properties": {
+            "part": "head"
+          }
+        }
+      ]
+    }
+  ]
+}

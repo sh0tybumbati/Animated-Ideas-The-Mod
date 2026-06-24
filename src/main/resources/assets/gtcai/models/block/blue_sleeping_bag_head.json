@@ -1,0 +1,41 @@
+{
+  "textures": {
+    "all": "gtcai:block/blue_sleeping_bag_head",
+    "particle": "gtcai:block/blue_sleeping_bag_head"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        3,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#all",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#all"
+        },
+        "north": {
+          "texture": "#all"
+        },
+        "south": {
+          "texture": "#all"
+        },
+        "east": {
+          "texture": "#all"
+        },
+        "west": {
+          "texture": "#all"
+        }
+      }
+    }
+  ]
+}

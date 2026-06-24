@@ -1,0 +1,28 @@
+{
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:registry_contains",
+      "registry": "minecraft:item",
+      "values": [
+        "gtcai:red_sleeping_bag"
+      ]
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "WWW",
+    "SSS"
+  ],
+  "key": {
+    "W": {
+      "item": "minecraft:red_wool"
+    },
+    "S": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "id": "gtcai:red_sleeping_bag",
+    "count": 1
+  }
+}

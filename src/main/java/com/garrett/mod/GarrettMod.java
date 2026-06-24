@@ -146,8 +146,14 @@ public class GarrettMod implements ModInitializer {
 	// Cooking eggs, sleeping bag, trumpet (Part 3 smalls).
 	public static final Item FRIED_EGG = new Item(new Item.Properties()
 		.food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.4f).build()));
-	public static final Block SLEEPING_BAG_BLOCK = new SleepingBagBlock(DyeColor.RED,
-		BlockBehaviour.Properties.ofFullCopy(Blocks.RED_BED));
+	// Sleeping bags come in all 16 dye colors, like beds.
+	public static final Map<DyeColor, Block> SLEEPING_BAGS = new EnumMap<>(DyeColor.class);
+	static {
+		for (DyeColor color : DyeColor.values()) {
+			SLEEPING_BAGS.put(color, new SleepingBagBlock(color,
+				BlockBehaviour.Properties.ofFullCopy(Blocks.RED_BED).mapColor(color)));
+		}
+	}
 	public static final Item TRUMPET = new TrumpetItem(new Item.Properties().stacksTo(1));
 	public static final SoundEvent TRUMPET_LOW = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.low"));
 	public static final SoundEvent TRUMPET_MID = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.mid"));
@@ -236,9 +242,12 @@ public class GarrettMod implements ModInitializer {
 		}
 
 		if (CONFIG.enableSleepingBags) {
-			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sleeping_bag"), SLEEPING_BAG_BLOCK);
-			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sleeping_bag"),
-				new BlockItem(SLEEPING_BAG_BLOCK, new Item.Properties()));
+			for (Map.Entry<DyeColor, Block> entry : SLEEPING_BAGS.entrySet()) {
+				String name = entry.getKey().getName() + "_sleeping_bag";
+				Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, name), entry.getValue());
+				Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, name),
+					new BlockItem(entry.getValue(), new Item.Properties()));
+			}
 			// Sleeping in a sleeping bag must NOT change the player's spawn point.
 			EntitySleepEvents.ALLOW_SETTING_SPAWN.register((player, sleepingPos) ->
 				!(player.level().getBlockState(sleepingPos).getBlock() instanceof SleepingBagBlock));
@@ -496,7 +505,7 @@ public class GarrettMod implements ModInitializer {
 				entries.accept(CHEESE_BLOCK);
 			}
 			if (CONFIG.enableCookingEggs) entries.accept(FRIED_EGG);
-			if (CONFIG.enableSleepingBags) entries.accept(SLEEPING_BAG_BLOCK);
+			if (CONFIG.enableSleepingBags) for (Block bag : SLEEPING_BAGS.values()) entries.accept(bag);
 			if (CONFIG.enableTrumpets) entries.accept(TRUMPET);
 			if (CONFIG.enableSandwiches) {
 				for (Item sandwich : Sandwiches.ITEMS.values()) entries.accept(sandwich);
