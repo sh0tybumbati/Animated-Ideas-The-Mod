@@ -1,0 +1,64 @@
+{
+  "variants": {
+    "facing=north,part=head,occupied=true": {
+      "model": "gtcai:block/sleeping_bag"
+    },
+    "facing=north,part=head,occupied=false": {
+      "model": "gtcai:block/sleeping_bag"
+    },
+    "facing=north,part=foot,occupied=true": {
+      "model": "gtcai:block/sleeping_bag"
+    },
+    "facing=north,part=foot,occupied=false": {
+      "model": "gtcai:block/sleeping_bag"
+    },
+    "facing=east,part=head,occupied=true": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 90
+    },
+    "facing=east,part=head,occupied=false": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 90
+    },
+    "facing=east,part=foot,occupied=true": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 90
+    },
+    "facing=east,part=foot,occupied=false": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 90
+    },
+    "facing=south,part=head,occupied=true": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 180
+    },
+    "facing=south,part=head,occupied=false": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 180
+    },
+    "facing=south,part=foot,occupied=true": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 180
+    },
+    "facing=south,part=foot,occupied=false": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 180
+    },
+    "facing=west,part=head,occupied=true": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 270
+    },
+    "facing=west,part=head,occupied=false": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 270
+    },
+    "facing=west,part=foot,occupied=true": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 270
+    },
+    "facing=west,part=foot,occupied=false": {
+      "model": "gtcai:block/sleeping_bag",
+      "y": 270
+    }
+  }
+}

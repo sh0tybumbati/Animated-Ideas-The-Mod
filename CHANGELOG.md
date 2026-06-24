@@ -1,5 +1,27 @@
 # Changelog
 
+## v1.4.0
+**Part 3 begins**
+
+**Cheese**
+- Right-click an empty cauldron with a **milk bucket** to fill it; after ~10s the milk curdles into a **Cheese Block** that pops out above.
+- Uncraft a Cheese Block into **9 edible cheese slices** (and craft 9 back into a block).
+
+**Cooking Eggs**
+- Cook a vanilla **egg** in a furnace, smoker, air fryer, or campfire into an edible **Fried Egg**.
+
+**Sleeping Bags**
+- A bed-like block crafted from **3 wool + 3 string** that you can sleep in to pass the night **without resetting your spawn point**.
+
+**Trumpets**
+- A brass **Trumpet** crafted from gold that plays low/mid/high notes based on where you're looking (placeholder note sounds for now).
+
+**Frying Pan**
+- A two-and-two… er, **four-slot** campfire-style cooker that **floats on top of a lit campfire** and cooks at **2× campfire speed**; finished food pops off above.
+- Uses the vanilla **campfire-cooking** recipe set; cooks only while the campfire below is lit, and pops off (dropping its food) if that campfire is removed.
+- Raw eggs render as a little **3D sunny-side-up egg** while frying — both on the pan and on campfires.
+- Also wieldable as a **melee weapon**: a light, slow, heavy bonk with a metallic clang and extra knockback, held sword-style.
+
 ## v1.3.5
 - **Splash Potion of Milk** now uses the vanilla splash-potion model (glass bottle + liquid) tinted **white**, as both the item and the thrown projectile.
 

@@ -1,0 +1,5 @@
+{
+  "trumpet.low":  { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "minecraft:note/bass" } ] },
+  "trumpet.mid":  { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "minecraft:note/harp" } ] },
+  "trumpet.high": { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "minecraft:note/bell" } ] }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=east":  { "model": "gtcai:block/frying_pan" },
+    "facing=south": { "model": "gtcai:block/frying_pan", "y": 90 },
+    "facing=west":  { "model": "gtcai:block/frying_pan", "y": 180 },
+    "facing=north": { "model": "gtcai:block/frying_pan", "y": 270 }
+  }
+}

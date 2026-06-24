@@ -1,0 +1,110 @@
+{
+	"format_version": "1.21.11",
+	"credit": "10x10 footprint, 2px-deep body (1px floor + 1px walls) with a 1px-walled hollow, plus a 1px-thick handle sticking 3px off the +X side, attached at the top pixel. Anvil-textured.",
+	"textures": {
+		"particle": "block/cauldron_side",
+		"all": "block/cauldron_side"
+	},
+	"elements": [
+		{
+			"name": "floor",
+			"from": [3, 0, 3],
+			"to": [13, 1, 13],
+			"faces": {
+				"north": {"uv": [3, 15, 13, 16], "texture": "#all"},
+				"east": {"uv": [3, 15, 13, 16], "texture": "#all"},
+				"south": {"uv": [3, 15, 13, 16], "texture": "#all"},
+				"west": {"uv": [3, 15, 13, 16], "texture": "#all"},
+				"up": {"uv": [3, 3, 13, 13], "texture": "#all"},
+				"down": {"uv": [3, 3, 13, 13], "texture": "#all", "cullface": "down"}
+			}
+		},
+		{
+			"name": "north wall",
+			"from": [3, 1, 3],
+			"to": [13, 2, 4],
+			"faces": {
+				"north": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"south": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"up": {"uv": [3, 3, 13, 4], "texture": "#all"}
+			}
+		},
+		{
+			"name": "south wall",
+			"from": [3, 1, 12],
+			"to": [13, 2, 13],
+			"faces": {
+				"north": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"south": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"up": {"uv": [3, 12, 13, 13], "texture": "#all"}
+			}
+		},
+		{
+			"name": "west wall",
+			"from": [3, 1, 3],
+			"to": [4, 2, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, -1]},
+			"faces": {
+				"east": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"west": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"up": {"uv": [3, 2, 4, 12], "texture": "#all"}
+			}
+		},
+		{
+			"name": "east wall",
+			"from": [12, 1, 3],
+			"to": [13, 2, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, -1]},
+			"faces": {
+				"east": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"west": {"uv": [3, 14, 13, 15], "texture": "#all"},
+				"up": {"uv": [12, 2, 13, 12], "texture": "#all"}
+			}
+		},
+		{
+			"name": "handle (1px thick, sticks 4px out the +X side, on the top pixel of the pan)",
+			"from": [13, 1, 7.5],
+			"to": [17, 2, 8.5],
+			"faces": {
+				"north": {"uv": [12, 14, 16, 15], "texture": "#all"},
+				"east": {"uv": [7, 14, 8, 15], "texture": "#all"},
+				"south": {"uv": [12, 14, 16, 15], "texture": "#all"},
+				"up": {"uv": [12, 7, 16, 8], "texture": "#all"},
+				"down": {"uv": [12, 7, 16, 8], "texture": "#all"}
+			}
+		}
+	],
+	"display": {
+		"thirdperson_righthand": {
+			"rotation": [90, -90, 0],
+			"translation": [0, 3.5, 5.5],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"thirdperson_lefthand": {
+			"rotation": [-90, 90, 180],
+			"translation": [0, 3.25, 5.25],
+			"scale": [0.55, 0.55, 0.55]
+		},
+		"firstperson_righthand": {
+			"rotation": [45, -90, 0],
+			"translation": [1.5, 8.5, 1.5],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"firstperson_lefthand": {
+			"rotation": [45, 90, 0],
+			"translation": [1.5, 8.5, 1.5],
+			"scale": [0.6, 0.6, 0.6]
+		},
+		"ground": {
+			"translation": [0, 2, 0],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"gui": {
+			"rotation": [30, -135, 0],
+			"scale": [0.625, 0.625, 0.625]
+		},
+		"fixed": {
+			"scale": [0.5, 0.5, 0.5]
+		}
+	}
+}

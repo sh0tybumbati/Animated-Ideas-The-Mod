@@ -8,9 +8,9 @@ The mod is released by episode: each update adds the ideas from another part of 
 
 Requirements: Minecraft 1.21(more to come), Fabric Loader, Fabric API, Cloth Config, Mod Menu
 
-Status: Part 1 is fully fleshed out. 
-Part 2 is the active episode (4 of 6 features done). 
-Parts 3 and beyond are on the roadmap.
+Status: Parts 1 and 2 are fully fleshed out. 
+Part 3 is the active episode (several features done, more to come). 
+Parts 4 and beyond are on the roadmap.
 
 ---
 
@@ -33,13 +33,20 @@ Parts 3 and beyond are on the roadmap.
 - SANDWICH!!! - 2 bread + anything. it will add two breads worth of hunger honches to the thing. I got real dumb with this one. (art to be improved over time)
 
 
-### Part 2 (In Progress)
+### Part 2 (complete)
 - Placeable Pumpkin Pie - set pumpkin pie down like a cake and eat it slice by slice
 - Splash Potion of Milk - a throwable potion that clears status effects in an area of effect.
-- Doodle Books (in progress) - MS Paint style drawing interface inside a book.
+- Doodle Books - MS Paint style drawing interface inside a book.
 - ~~_**Jungle Villages**_~~ (sorry this is also way too huge a feature T>T)
 - Dangerous Stonecutters - stonecutters now hurt entities that stand on them.
 - Physical Trident Hitboxes (might be tweaked later)  - tridents stuck in the ground become solid enough to stand on.
+
+### Part 3 (In Progress)
+- Cheese Blocks - fill a cauldron with a milk bucket and it curdles into a cheese block; uncraft that into nine edible cheese slices.
+- Cooking Eggs - cook an egg in a furnace, smoker, air fryer, or campfire for an edible fried egg.
+- Sleeping Bags - 3 wool + 3 string; sleep through the night WITHOUT resetting your spawn point.
+- Trumpets - a gold trumpet that toots low, mid, or high depending on where you're looking (placeholder sounds for now).
+- Frying Pan (bonus) - floats on top of a lit campfire and fries up to four foods at twice campfire speed; raw eggs even render as little sunny-side-up eggs while they cook. Doubles as a goofy melee weapon.
 
 
 ---
@@ -47,13 +54,9 @@ Parts 3 and beyond are on the roadmap.
 ## Coming Soon
 
   
-### Part 3
-- Cheese Blocks
-- Unique Cave-Depth Animations
-- Trumpets
-- Cooking Eggs
+### Part 3 (remaining)
+- Unique Death Animations
 - Chaining Minecarts
-- Sleeping Bags
 - Banner Patterns on Beds
 
 ### Part 5

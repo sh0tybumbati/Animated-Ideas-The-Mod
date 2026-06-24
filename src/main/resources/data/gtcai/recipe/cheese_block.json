@@ -1,0 +1,7 @@
+{
+  "fabric:load_conditions": [ { "condition": "fabric:registry_contains", "registry": "minecraft:item", "values": ["gtcai:cheese_block"] } ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["###","###","###"],
+  "key": { "#": { "item": "gtcai:cheese" } },
+  "result": { "id": "gtcai:cheese_block", "count": 1 }
+}

@@ -68,6 +68,10 @@ public class GarrettModClient implements ClientModInitializer {
 			BlockEntityRenderers.register(GarrettMod.CARVABLE_PUMPKIN_BLOCK_ENTITY, CarvablePumpkinBlockEntityRenderer::new);
 		}
 
+		if (GarrettMod.FRYING_PAN_BLOCK_ENTITY != null) {
+			BlockEntityRenderers.register(GarrettMod.FRYING_PAN_BLOCK_ENTITY, FryingPanBlockEntityRenderer::new);
+		}
+
 		// Right-click a doodle book to open the drawing screen (client-side only).
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			ItemStack stack = player.getItemInHand(hand);

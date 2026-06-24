@@ -1,0 +1,8 @@
+{
+  "fabric:load_conditions": [ { "condition": "fabric:registry_contains", "registry": "minecraft:item", "values": ["gtcai:fried_egg"] } ],
+  "type": "minecraft:campfire_cooking",
+  "ingredient": { "item": "minecraft:egg" },
+  "result": { "id": "gtcai:fried_egg" },
+  "experience": 0.1,
+  "cookingtime": 600
+}

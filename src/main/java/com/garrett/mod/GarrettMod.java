@@ -9,6 +9,7 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.entity.event.v1.EntitySleepEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -20,6 +21,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.resources.ResourceKey;
@@ -32,8 +34,12 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Parrot;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.DyeItem;
@@ -41,13 +47,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.PushReaction;
@@ -78,6 +87,11 @@ public class GarrettMod implements ModInitializer {
 			.lightLevel(s -> s.getValue(BlockStateProperties.LIT) ? 13 : 0)
 	);
 	public static BlockEntityType<AirFryerBlockEntity> AIR_FRYER_BLOCK_ENTITY;
+
+	public static final Block FRYING_PAN_BLOCK = new FryingPanBlock(
+		BlockBehaviour.Properties.of().strength(2.0f).requiresCorrectToolForDrops().noOcclusion()
+	);
+	public static BlockEntityType<FryingPanBlockEntity> FRYING_PAN_BLOCK_ENTITY;
 
 	public static final Block CARVABLE_PUMPKIN_BLOCK = new CarvablePumpkinBlock(
 		BlockBehaviour.Properties.ofFullCopy(Blocks.PUMPKIN)
@@ -121,6 +135,24 @@ public class GarrettMod implements ModInitializer {
 
 	public static final Item DOODLE_BOOK = new DoodleBookItem(new Item.Properties().stacksTo(1));
 
+	// Cheese: edible slice, building block, and the milk-cauldron that produces it.
+	public static final Item CHEESE = new Item(new Item.Properties()
+		.food(new FoodProperties.Builder().nutrition(4).saturationModifier(0.6f).build()));
+	public static final Block CHEESE_BLOCK = new Block(
+		BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.5f).sound(SoundType.WOOL));
+	public static final Block MILK_CAULDRON_BLOCK = new MilkCauldronBlock(
+		BlockBehaviour.Properties.ofFullCopy(Blocks.CAULDRON).noLootTable());
+
+	// Cooking eggs, sleeping bag, trumpet (Part 3 smalls).
+	public static final Item FRIED_EGG = new Item(new Item.Properties()
+		.food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.4f).build()));
+	public static final Block SLEEPING_BAG_BLOCK = new SleepingBagBlock(DyeColor.RED,
+		BlockBehaviour.Properties.ofFullCopy(Blocks.RED_BED));
+	public static final Item TRUMPET = new TrumpetItem(new Item.Properties().stacksTo(1));
+	public static final SoundEvent TRUMPET_LOW = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.low"));
+	public static final SoundEvent TRUMPET_MID = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.mid"));
+	public static final SoundEvent TRUMPET_HIGH = SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.high"));
+
 	public static EntityType<ThrownMilkPotion> THROWN_MILK_POTION_ENTITY_TYPE;
 
 	public static final ResourceKey<CreativeModeTab> ITEM_GROUP_KEY =
@@ -161,6 +193,24 @@ public class GarrettMod implements ModInitializer {
 				BlockEntityType.Builder.of(AirFryerBlockEntity::new, AIR_FRYER_BLOCK).build(null));
 		}
 
+		if (CONFIG.enableFryingPan) {
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "frying_pan"), FRYING_PAN_BLOCK);
+			// Wieldable as a goofy, heavy, slow melee weapon: a light bonk but a slow swing.
+			ItemAttributeModifiers panAttributes = ItemAttributeModifiers.builder()
+				.add(Attributes.ATTACK_DAMAGE,
+					new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, 2.0, AttributeModifier.Operation.ADD_VALUE),
+					EquipmentSlotGroup.MAINHAND)
+				.add(Attributes.ATTACK_SPEED,
+					new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.8, AttributeModifier.Operation.ADD_VALUE),
+					EquipmentSlotGroup.MAINHAND)
+				.build();
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "frying_pan"),
+				new FryingPanItem(FRYING_PAN_BLOCK, new Item.Properties().attributes(panAttributes)));
+			FRYING_PAN_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
+				ResourceLocation.fromNamespaceAndPath(MOD_ID, "frying_pan"),
+				BlockEntityType.Builder.of(FryingPanBlockEntity::new, FRYING_PAN_BLOCK).build(null));
+		}
+
 		if (CONFIG.enableDoodleBooks) {
 			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "doodle_book"), DOODLE_BOOK);
 			PayloadTypeRegistry.playC2S().register(DoodleBookSavePayload.TYPE, DoodleBookSavePayload.CODEC);
@@ -179,6 +229,34 @@ public class GarrettMod implements ModInitializer {
 					}
 				});
 			});
+		}
+
+		if (CONFIG.enableCookingEggs) {
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "fried_egg"), FRIED_EGG);
+		}
+
+		if (CONFIG.enableSleepingBags) {
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sleeping_bag"), SLEEPING_BAG_BLOCK);
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "sleeping_bag"),
+				new BlockItem(SLEEPING_BAG_BLOCK, new Item.Properties()));
+			// Sleeping in a sleeping bag must NOT change the player's spawn point.
+			EntitySleepEvents.ALLOW_SETTING_SPAWN.register((player, sleepingPos) ->
+				!(player.level().getBlockState(sleepingPos).getBlock() instanceof SleepingBagBlock));
+		}
+
+		if (CONFIG.enableTrumpets) {
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet"), TRUMPET);
+			Registry.register(BuiltInRegistries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.low"), TRUMPET_LOW);
+			Registry.register(BuiltInRegistries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.mid"), TRUMPET_MID);
+			Registry.register(BuiltInRegistries.SOUND_EVENT, ResourceLocation.fromNamespaceAndPath(MOD_ID, "trumpet.high"), TRUMPET_HIGH);
+		}
+
+		if (CONFIG.enableCheese) {
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "cheese"), CHEESE);
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "cheese_block"), CHEESE_BLOCK);
+			Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "cheese_block"),
+				new BlockItem(CHEESE_BLOCK, new Item.Properties()));
+			Registry.register(BuiltInRegistries.BLOCK, ResourceLocation.fromNamespaceAndPath(MOD_ID, "milk_cauldron"), MILK_CAULDRON_BLOCK);
 		}
 
 		if (CONFIG.enableCustomPumpkinCarving) {
@@ -411,7 +489,15 @@ public class GarrettMod implements ModInitializer {
 
 		ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP_KEY).register(entries -> {
 			if (CONFIG.enableAirFryer) entries.accept(AIR_FRYER_BLOCK);
+			if (CONFIG.enableFryingPan) entries.accept(FRYING_PAN_BLOCK);
 			if (CONFIG.enableDoodleBooks) entries.accept(DOODLE_BOOK);
+			if (CONFIG.enableCheese) {
+				entries.accept(CHEESE);
+				entries.accept(CHEESE_BLOCK);
+			}
+			if (CONFIG.enableCookingEggs) entries.accept(FRIED_EGG);
+			if (CONFIG.enableSleepingBags) entries.accept(SLEEPING_BAG_BLOCK);
+			if (CONFIG.enableTrumpets) entries.accept(TRUMPET);
 			if (CONFIG.enableSandwiches) {
 				for (Item sandwich : Sandwiches.ITEMS.values()) entries.accept(sandwich);
 			}
@@ -446,6 +532,26 @@ public class GarrettMod implements ModInitializer {
 				world.playSound(null, pos, SoundEvents.PUMPKIN_CARVE, SoundSource.BLOCKS, 1.0f, 1.0f);
 			}
 			return InteractionResult.SUCCESS;
+		});
+
+		// Cheese: fill an empty cauldron with a milk bucket to start it curdling.
+		UseBlockCallback.EVENT.register((player, world, hand, hitResult) -> {
+			if (!CONFIG.enableCheese) return InteractionResult.PASS;
+			ItemStack stack = player.getItemInHand(hand);
+			if (!stack.is(Items.MILK_BUCKET)) return InteractionResult.PASS;
+			BlockPos pos = hitResult.getBlockPos();
+			if (!world.getBlockState(pos).is(Blocks.CAULDRON)) return InteractionResult.PASS;
+			if (!world.isClientSide()) {
+				world.setBlockAndUpdate(pos, MILK_CAULDRON_BLOCK.defaultBlockState());
+				world.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
+				if (!player.isCreative()) {
+					stack.shrink(1);
+					ItemStack bucket = new ItemStack(Items.BUCKET);
+					if (stack.isEmpty()) player.setItemInHand(hand, bucket);
+					else if (!player.getInventory().add(bucket)) player.drop(bucket, false);
+				}
+			}
+			return InteractionResult.sidedSuccess(world.isClientSide());
 		});
 
 		LOGGER.info("GarrettTheCarrotMod initialized!");

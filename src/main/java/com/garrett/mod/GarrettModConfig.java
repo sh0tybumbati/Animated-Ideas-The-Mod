@@ -50,4 +50,19 @@ public class GarrettModConfig implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip
     public boolean enableDoodleBooks = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableCheese = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableCookingEggs = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableSleepingBags = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableTrumpets = true;
+
+    @ConfigEntry.Gui.Tooltip
+    public boolean enableFryingPan = true;
 }

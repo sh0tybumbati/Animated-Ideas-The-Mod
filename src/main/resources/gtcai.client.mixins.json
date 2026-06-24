@@ -3,7 +3,8 @@
 	"package": "com.garrett.mod.client.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"PickBlockMixin"
+		"PickBlockMixin",
+		"CampfireEggRenderMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
