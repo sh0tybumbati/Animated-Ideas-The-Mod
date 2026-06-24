@@ -1,5 +1,5 @@
 {
-  "trumpet.low":  { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "minecraft:note/bass" } ] },
-  "trumpet.mid":  { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "minecraft:note/harp" } ] },
-  "trumpet.high": { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "minecraft:note/bell" } ] }
+  "trumpet.low":  { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "gtcai:trumpet/low" } ] },
+  "trumpet.mid":  { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "gtcai:trumpet/mid" } ] },
+  "trumpet.high": { "subtitle": "gtcai.trumpet", "sounds": [ { "name": "gtcai:trumpet/high" } ] }
 }
