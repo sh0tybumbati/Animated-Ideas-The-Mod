@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.4.3
+- **Banner patterns on sleeping bags** — right-click a placed sleeping bag with a banner to stamp its design onto the bedroll (consumes the banner, kept in creative). Uses real banner-pattern compositing across the whole 2-block bag, cropped so the head pillow still shows.
+- Breaking a patterned bag **preserves the design** on the dropped item (and restores it on placement), like a banner.
+- Sleeping bag hitbox is now a flat slab matching the model instead of the tall vanilla bed shape.
+
 ## v1.4.2
 - **Trumpets** now play real trumpet notes (C/E/G for low/mid/high) instead of placeholder note-block sounds, sourced from the University of Iowa Electronic Music Studios sample library (free, unrestricted use).
 - Updated the trumpet item texture.

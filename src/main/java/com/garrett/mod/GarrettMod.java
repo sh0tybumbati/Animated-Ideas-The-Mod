@@ -148,6 +148,7 @@ public class GarrettMod implements ModInitializer {
 		.food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.4f).build()));
 	// Sleeping bags come in all 16 dye colors, like beds.
 	public static final Map<DyeColor, Block> SLEEPING_BAGS = new EnumMap<>(DyeColor.class);
+	public static BlockEntityType<SleepingBagBlockEntity> SLEEPING_BAG_BLOCK_ENTITY;
 	static {
 		for (DyeColor color : DyeColor.values()) {
 			SLEEPING_BAGS.put(color, new SleepingBagBlock(color,
@@ -248,6 +249,9 @@ public class GarrettMod implements ModInitializer {
 				Registry.register(BuiltInRegistries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, name),
 					new BlockItem(entry.getValue(), new Item.Properties()));
 			}
+			SLEEPING_BAG_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE,
+				ResourceLocation.fromNamespaceAndPath(MOD_ID, "sleeping_bag"),
+				BlockEntityType.Builder.of(SleepingBagBlockEntity::new, SLEEPING_BAGS.values().toArray(new Block[0])).build(null));
 			// Sleeping in a sleeping bag must NOT change the player's spawn point.
 			EntitySleepEvents.ALLOW_SETTING_SPAWN.register((player, sleepingPos) ->
 				!(player.level().getBlockState(sleepingPos).getBlock() instanceof SleepingBagBlock));

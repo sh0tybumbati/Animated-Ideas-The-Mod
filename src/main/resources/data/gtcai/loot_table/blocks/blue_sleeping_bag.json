@@ -6,7 +6,17 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "gtcai:blue_sleeping_bag"
+          "name": "gtcai:blue_sleeping_bag",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": [
+                "minecraft:banner_patterns",
+                "minecraft:base_color"
+              ]
+            }
+          ]
         }
       ],
       "conditions": [
